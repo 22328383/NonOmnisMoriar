@@ -16,13 +16,13 @@ import util.UnitTests;
 
 public class MainWindow {
 
-    private static JFrame frame = new JFrame("Game"); // Name of your game
+    private static JFrame frame = new JFrame("Reel Safari"); // Name of your game
     private static Model gameworld = new Model();
     private static Viewer canvas = new Viewer(gameworld);
 
     private KeyListener controller = new Controller();
 
-    private static int targetFPS = 60;
+    private static int targetFPS = 100;
     private static boolean startGame = false;
 
     private JLabel backgroundImageForStartMenu;
@@ -100,6 +100,6 @@ public class MainWindow {
         canvas.updateview();
 
         // Score update
-        frame.setTitle("Score = " + gameworld.getScore());
+        frame.setTitle("Money = " + gameworld.getScore());
     }
 }

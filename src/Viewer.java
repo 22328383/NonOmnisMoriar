@@ -51,25 +51,6 @@ public class Viewer extends JPanel {
         drawPlayer(x, y, width, height, texture, g);
     }
 
-    private void drawEnemies(int x, int y, int width, int height, String texture, Graphics g) {
-        File textureToLoad = new File(texture);
-        try {
-            Image myImage = ImageIO.read(textureToLoad);
-
-            int currentPositionInAnimation = ((int) (currentAnimationTime % 4) * 32);
-            g.drawImage(
-                    myImage,
-                    x, y, x + width, y + height,
-                    currentPositionInAnimation, 0,
-                    currentPositionInAnimation + 31, 32,
-                    null
-            );
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void drawBackground(Graphics g) {
         File textureToLoad = new File("res/spacebackground.png");
         try {
