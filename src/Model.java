@@ -4,86 +4,93 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import util.GameObject;
 import util.Point3f;
-import util.Vector3f; 
+import util.Vector3f;
 
 public class Model {
-	
-	 private  GameObject Player;
-	 private Controller controller = Controller.getInstance();
-	 private  CopyOnWriteArrayList<GameObject> FishList   = new CopyOnWriteArrayList<GameObject>();
-	 private  CopyOnWriteArrayList<GameObject> BulletList = new CopyOnWriteArrayList<GameObject>();
-	 private int Score=0; 
 
-	public Model() {
-		 //setup game world 
-		//Player 	    
-	}
-	
-	// This is the heart of the game , where the model takes in all the inputs ,decides the outcomes and then changes the model accordingly. 
-	public void gamelogic() 
-	{
-		// Player Logic first 
-		playerLogic(); 
-		// interactions between objects 
-		gameLogic(); 
-	   
-	}
+    private GameObject player;
+    private Controller controller = Controller.getInstance();
+    private CopyOnWriteArrayList<GameObject> fishList =
+            new CopyOnWriteArrayList<GameObject>();
+    private CopyOnWriteArrayList<GameObject> bulletList =
+            new CopyOnWriteArrayList<GameObject>();
+    private int score = 0;
 
-	private void gameLogic() { 
-		
-		
-		// this is a way to increment across the array list data structure 
+    public Model() {
+        player = new GameObject(
+                "res/assets/hero.png",
+                128,
+                128,
+                new Point3f(500, 500, 0)
+        );
+    }
 
-		
-		//see if they hit anything 
-		// using enhanced for-loop style as it makes it alot easier both code wise and reading wise too 
-		
-	}
+    // This is the heart of the game: the model takes in all inputs,
+    // decides outcomes, and updates the model accordingly.
+    public void gamelogic() {
+        // Player logic first
+        playerLogic();
 
-	private void playerLogic() {
-				 
-		//check for movement and if you fired a bullet 
-		  
-if(Controller.getInstance().isKeyAPressed()){Player.getCentre().ApplyVector( new Vector3f(-2,0,0)); }
-		
-		if(Controller.getInstance().isKeyDPressed())
-		{
-			Player.getCentre().ApplyVector( new Vector3f(2,0,0));
-		}
-			
-		if(Controller.getInstance().isKeyWPressed())
-		{
-			Player.getCentre().ApplyVector( new Vector3f(0,2,0));
-		}
-		
-		if(Controller.getInstance().isKeySPressed()){Player.getCentre().ApplyVector( new Vector3f(0,-2,0));}
-		
-		if(Controller.getInstance().isKeySpacePressed())
-		{
-			CreateBullet();
-			Controller.getInstance().setKeySpacePressed(false);
-		} 
-		
-	}
+        // Interactions between objects
+        gameLogic();
+    }
 
-	private void CreateBullet() {
-		BulletList.add(new GameObject("res/Bullet.png",32,64,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f)));
-		
-	}
+    private void gameLogic() {
+        // Increment across the array list
 
-	public GameObject getPlayer() {
-		return Player;
-	}
+        // See if they hit anything
+        // Using enhanced for-loop style as it makes it easier to read
+    }
 
-	
-	public CopyOnWriteArrayList<GameObject> getBullets() {
-		return BulletList;
-	}
+    private void playerLogic() {
+        // Check for movement and if you fired a bullet
 
-	public int getScore() { 
-		return Score;
-	}
- 
+        if (controller.isKeyAPressed()) {
+            player.getCentre().ApplyVector(new Vector3f(-2, 0, 0));
+        }
 
+        if (controller.isKeyDPressed()) {
+            player.getCentre().ApplyVector(new Vector3f(2, 0, 0));
+        }
+
+        if (controller.isKeyWPressed()) {
+            player.getCentre().ApplyVector(new Vector3f(0, 2, 0));
+        }
+
+        if (controller.isKeySPressed()) {
+            player.getCentre().ApplyVector(new Vector3f(0, -2, 0));
+        }
+
+        if (controller.isKeySpacePressed()) {
+            createBullet();
+            controller.setKeySpacePressed(false);
+        }
+    }
+
+    private void createBullet() {
+        bulletList.add(
+                new GameObject(
+                        "res/Bullet.png",
+                        32,
+                        64,
+                        new Point3f(
+                                player.getCentre().getX(),
+                                player.getCentre().getY(),
+                                0.0f
+                        )
+                )
+        );
+    }
+
+    public GameObject getPlayer() {
+        return player;
+    }
+
+    public CopyOnWriteArrayList<GameObject> getBullets() {
+        return bulletList;
+    }
+
+    public int getScore() {
+        return score;
+    }
 }
-

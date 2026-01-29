@@ -1,118 +1,115 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.HashMap;
 
-//Singeton pattern
+// Singleton pattern
 public class Controller implements KeyListener {
-        
-	   private static boolean KeyAPressed= false;
-	   private static boolean KeySPressed= false;
-	   private static boolean KeyDPressed= false;
-	   private static boolean KeyWPressed= false;
-	   private static boolean KeySpacePressed= false;
-	   
-	   private static final Controller instance = new Controller();
-	   
-	 public Controller() { 
-	}
-	 
-	 public static Controller getInstance(){
-	        return instance;
-	    }
-	   
-	@Override
-	// Key pressed , will keep triggering 
-	public void keyTyped(KeyEvent e) { 
-		 
-	}
 
-	@Override
-	public void keyPressed(KeyEvent e) 
-	{ 
-		switch (e.getKeyChar()) 
-		{
-			case 'a':setKeyAPressed(true);break;  
-			case 's':setKeySPressed(true);break;
-			case 'w':setKeyWPressed(true);break;
-			case 'd':setKeyDPressed(true);break;
-			case ' ':setKeySpacePressed(true);break;   
-		    default:
-		    	//System.out.println("Controller test:  Unknown key pressed");
-		        break;
-		}  
-		
-	 // You can implement to keep moving while pressing the key here . 
-		
-	}
+	private static boolean keyAPressed = false;
+    private static boolean keySPressed = false;
+    private static boolean keyDPressed = false;
+    private static boolean keyWPressed = false;
+    private static boolean keySpacePressed = false;
 
-	@Override
-	public void keyReleased(KeyEvent e) 
-	{ 
-		switch (e.getKeyChar()) 
-		{
-			case 'a':setKeyAPressed(false);break;  
-			case 's':setKeySPressed(false);break;
-			case 'w':setKeyWPressed(false);break;
-			case 'd':setKeyDPressed(false);break;
-			case ' ':setKeySpacePressed(false);break;   
-		    default:
-		    	//System.out.println("Controller test:  Unknown key pressed");
-		        break;
-		}  
-		 //upper case 
-	
-	}
+    private static final Controller instance = new Controller();
 
+    public Controller() {
+    }
 
-	public boolean isKeyAPressed() {
-		return KeyAPressed;
-	}
+    public static Controller getInstance() {
+        return instance;
+    }
 
+    @Override
+    // Key typed (not used here)
+    public void keyTyped(KeyEvent e) {
+    }
 
-	public void setKeyAPressed(boolean keyAPressed) {
-		KeyAPressed = keyAPressed;
-	}
+    @Override
+    // Key pressed (keeps triggering while held)
+    public void keyPressed(KeyEvent e) {
+        switch (e.getKeyChar()) {
+            case 'a':
+                setKeyAPressed(true);
+                break;
+            case 's':
+                setKeySPressed(true);
+                break;
+            case 'w':
+                setKeyWPressed(true);
+                break;
+            case 'd':
+                setKeyDPressed(true);
+                break;
+            case ' ':
+                setKeySpacePressed(true);
+                break;
+            default:
+                // Unknown key
+                break;
+        }
+    }
 
+    @Override
+    public void keyReleased(KeyEvent e) {
+        switch (e.getKeyChar()) {
+            case 'a':
+                setKeyAPressed(false);
+                break;
+            case 's':
+                setKeySPressed(false);
+                break;
+            case 'w':
+                setKeyWPressed(false);
+                break;
+            case 'd':
+                setKeyDPressed(false);
+                break;
+            case ' ':
+                setKeySpacePressed(false);
+                break;
+            default:
+                // Unknown key
+                break;
+        }
+    }
 
-	public boolean isKeySPressed() {
-		return KeySPressed;
-	}
+    public boolean isKeyAPressed() {
+        return keyAPressed;
+    }
 
+    public void setKeyAPressed(boolean keyAPressed) {
+        Controller.keyAPressed = keyAPressed;
+    }
 
-	public void setKeySPressed(boolean keySPressed) {
-		KeySPressed = keySPressed;
-	}
+    public boolean isKeySPressed() {
+        return keySPressed;
+    }
 
+    public void setKeySPressed(boolean keySPressed) {
+        Controller.keySPressed = keySPressed;
+    }
 
-	public boolean isKeyDPressed() {
-		return KeyDPressed;
-	}
+    public boolean isKeyDPressed() {
+        return keyDPressed;
+    }
 
+    public void setKeyDPressed(boolean keyDPressed) {
+        Controller.keyDPressed = keyDPressed;
+    }
 
-	public void setKeyDPressed(boolean keyDPressed) {
-		KeyDPressed = keyDPressed;
-	}
+    public boolean isKeyWPressed() {
+        return keyWPressed;
+    }
 
+    public void setKeyWPressed(boolean keyWPressed) {
+        Controller.keyWPressed = keyWPressed;
+    }
 
-	public boolean isKeyWPressed() {
-		return KeyWPressed;
-	}
+    public boolean isKeySpacePressed() {
+        return keySpacePressed;
+    }
 
-
-	public void setKeyWPressed(boolean keyWPressed) {
-		KeyWPressed = keyWPressed;
-	}
-
-
-	public boolean isKeySpacePressed() {
-		return KeySpacePressed;
-	}
-
-
-	public void setKeySpacePressed(boolean keySpacePressed) {
-		KeySpacePressed = keySpacePressed;
-	} 
-	
-	 
+    public void setKeySpacePressed(boolean keySpacePressed) {
+        Controller.keySpacePressed = keySpacePressed;
+    }
 }
