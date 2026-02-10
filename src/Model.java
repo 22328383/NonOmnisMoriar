@@ -12,14 +12,33 @@ public class Model {
     private GameObject player;
     private Controller controller = Controller.getInstance();
     private int score = 0;
+    private int[][] room;
+   
 
     public Model() {
         player = new GameObject(
-                "res/assets/hero.png",
-                128,
-                128,
-                new Point3f(500, 500, 0)
+                GameConstants.HERO_TEXTURE,
+                GameConstants.TILE_SIZE,
+                GameConstants.TILE_SIZE,
+                new Point3f(
+                    GameConstants.PLAYER_START_X * GameConstants.TILE_SIZE,
+                    GameConstants.PLAYER_START_Y * GameConstants.TILE_SIZE,
+                    0
+                )
         );
+
+        room = new int[GameConstants.GRID_SIZE][GameConstants.GRID_SIZE];
+        for(int i = 0; i < GameConstants.GRID_SIZE; i++) {
+            for(int j = 0; j < GameConstants.GRID_SIZE; j++) {
+                if(i == 0 || i == GameConstants.GRID_SIZE - 1 || j == 0 || j == GameConstants.GRID_SIZE - 1) {
+                    room[i][j] = 0;
+                } else if(i == 1 || i == GameConstants.GRID_SIZE - 2 || j == 1 || j == GameConstants.GRID_SIZE - 2) {
+                    room[i][j] = 1;
+                } else {
+                    room[i][j] = 2;
+                }
+            }
+        }
     }
 
     // This is the heart of the game: the model takes in all inputs,
@@ -40,22 +59,24 @@ public class Model {
     }
 
     private void playerLogic() {
-        // Check for movement and if you fired a bullet
-
         if(controller.isKeyAPressed()) {
-            player.getCentre().ApplyVector(new Vector3f(-2, 0, 0));
+            player.getCentre().ApplyVector(new Vector3f(-GameConstants.TILE_SIZE, 0, 0));
+            Controller.getInstance().setKeyAPressed(false);
         }
 
         if(controller.isKeyDPressed()) {
-            player.getCentre().ApplyVector(new Vector3f(2, 0, 0));
+            player.getCentre().ApplyVector(new Vector3f(GameConstants.TILE_SIZE, 0, 0));
+            Controller.getInstance().setKeyDPressed(false);
         }
 
         if(controller.isKeyWPressed()) {
-            player.getCentre().ApplyVector(new Vector3f(0, 2, 0));
+            player.getCentre().ApplyVector(new Vector3f(0, GameConstants.TILE_SIZE, 0));
+            Controller.getInstance().setKeyWPressed(false);
         }
 
         if(controller.isKeySPressed()) {
-            player.getCentre().ApplyVector(new Vector3f(0, -2, 0));
+            player.getCentre().ApplyVector(new Vector3f(0, -GameConstants.TILE_SIZE, 0));
+            Controller.getInstance().setKeySPressed(false);
         }
         if(controller.isKeySpacePressed()) {
         	castRod();
@@ -71,7 +92,7 @@ public class Model {
     public int getScore() {
         return Money;
     }
-    
+
     private void castRod() {
         if(!isFishing) {
             isFishing = true;
@@ -81,5 +102,9 @@ public class Model {
             System.out.println("Reeled in!");
             Money = Money + 10;
         }
+    }
+
+    public int[][] getRoom() {
+    	return room;
     }
 }

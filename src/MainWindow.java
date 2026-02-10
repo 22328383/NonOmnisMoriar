@@ -16,24 +16,23 @@ import util.UnitTests;
 
 public class MainWindow {
 
-    private static JFrame frame = new JFrame("Reel Safari"); // Name of your game
+    private static JFrame frame = new JFrame("Non Omnis Moriar");
     private static Model gameworld = new Model();
     private static Viewer canvas = new Viewer(gameworld);
 
     private KeyListener controller = new Controller();
 
-    private static int targetFPS = 100;
     private static boolean startGame = false;
 
     private JLabel backgroundImageForStartMenu;
 
     public MainWindow() {
-        frame.setSize(1000, 1000);
+        frame.setSize(GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(null);
 
         frame.add(canvas);
-        canvas.setBounds(0, 0, 1000, 1000);
+        canvas.setBounds(0, 0, GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT);
         canvas.setBackground(new Color(255, 255, 255));
         canvas.setVisible(false);
 
@@ -42,7 +41,6 @@ public class MainWindow {
             @Override
             public void actionPerformed(ActionEvent e) {
                 startMenuButton.setVisible(false);
-                backgroundImageForStartMenu.setVisible(false);
                 canvas.setVisible(true);
                 canvas.addKeyListener(controller);
                 canvas.requestFocusInWindow();
@@ -52,16 +50,7 @@ public class MainWindow {
 
         startMenuButton.setBounds(400, 500, 200, 40);
 
-        // Load background image
-        File backgroundToLoad = new File("res/startscreen.png");
-        try {
-            BufferedImage myPicture = ImageIO.read(backgroundToLoad);
-            backgroundImageForStartMenu = new JLabel(new ImageIcon(myPicture));
-            backgroundImageForStartMenu.setBounds(0, 0, 1000, 1000);
-            frame.add(backgroundImageForStartMenu);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
         frame.add(startMenuButton);
         frame.setVisible(true);
@@ -71,7 +60,7 @@ public class MainWindow {
         new MainWindow(); // Sets up environment
 
         while (true) { // Simple game loop
-            int timeBetweenFrames = 1000 / targetFPS;
+            int timeBetweenFrames = 1000 / GameConstants.TARGET_FPS;
             long frameCheck = System.currentTimeMillis() + timeBetweenFrames;
 
             // Wait until next frame
@@ -86,7 +75,7 @@ public class MainWindow {
             UnitTests.CheckFrameRate(
                     System.currentTimeMillis(),
                     frameCheck,
-                    targetFPS
+                    GameConstants.TARGET_FPS
             );
         }
     }

@@ -1,4 +1,5 @@
 import java.awt.Graphics;
+
 import java.awt.Image;
 import java.awt.LayoutManager;
 import java.io.File;
@@ -7,11 +8,12 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+
 public class Viewer extends JPanel {
 
-    private long currentAnimationTime = 0;
+    private TextureCache textureCache = new TextureCache();
 
-    private Model gameworld = new Model();
+    private Model gameworld;
 
     public Viewer(Model world) {
         this.gameworld = world;
@@ -33,13 +35,13 @@ public class Viewer extends JPanel {
         repaint();
     }
 
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        currentAnimationTime++;
 
-        // Draw background
-        drawBackground(g);
+        // Draw room
+        drawRoom(g);
 
         // Draw player
         int x = (int) gameworld.getPlayer().getCentre().getX();
@@ -51,46 +53,35 @@ public class Viewer extends JPanel {
         drawPlayer(x, y, width, height, texture, g);
     }
 
-    private void drawBackground(Graphics g) {
-        File textureToLoad = new File("res/spacebackground.png");
-        try {
-            Image myImage = ImageIO.read(textureToLoad);
-            g.drawImage(myImage, 0, 0, 1000, 1000, 0, 0, 1000, 1000, null);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void drawBullet(int x, int y, int width, int height, String texture, Graphics g) {
-        File textureToLoad = new File(texture);
-        try {
-            Image myImage = ImageIO.read(textureToLoad);
-            g.drawImage(myImage, x, y, x + width, y + height, 0, 0, 63, 127, null);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void drawRoom(Graphics g) {
+        int[][] tiles = gameworld.getRoom();
+        for(int i = 0; i < GameConstants.GRID_SIZE; i++) {
+            for(int j = 0; j < GameConstants.GRID_SIZE; j++) {
+                String texturePath;
+                switch(tiles[i][j]) {
+                case 0:
+                    texturePath = GameConstants.VOID_TEXTURE;
+                    break;
+                case 1:
+                    texturePath = GameConstants.FLOOR_TEXTURE;
+                    break;
+                case 2:
+                    texturePath = GameConstants.WALL_TEXTURE;
+                    break;
+                default:
+                    texturePath = GameConstants.VOID_TEXTURE;
+                    break;
+                }
+                Image textureToRender = textureCache.getImg(texturePath);
+                int startX = GameConstants.TILE_SIZE * i;
+                int startY = GameConstants.TILE_SIZE * j;
+                g.drawImage(textureToRender, startX, startY, GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, null);
+            }
         }
     }
 
     private void drawPlayer(int x, int y, int width, int height, String texture, Graphics g) {
-        File textureToLoad = new File(texture);
-        try {
-            Image myImage = ImageIO.read(textureToLoad);
-
-            int currentPositionInAnimation =
-                    ((int) ((currentAnimationTime % 40) / 10)) * 32;
-
-            g.drawImage(
-                    myImage,
-                    x, y, x + width, y + height,
-                    currentPositionInAnimation, 0,
-                    currentPositionInAnimation + 31, 32,
-                    null
-            );
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Image playerImg = textureCache.getImg(texture);
+        g.drawImage(playerImg, x, y, width, height, null);
     }
 }

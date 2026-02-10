@@ -1,0 +1,13 @@
+It is an immersive sandbox focused randomly generated dungeon crawler.
+The goal of the game is to get a high score. Essentially everything should give score. Looting, slaying enemies, solving puzzles, transitioning to a new level.
+This implies I want an advanced scoring system, inventory system, combat system and a level generating system all while making the game have a look and feel.
+I will now talk about these a bit more.
+
+-Advanced scoring system : The gameplay loop revolves around scoring big. My idea is that all actions have a base score, so for example finding a gold coin gives 5 score in the first level. As you go down a level, you get a multiplier, so that same gold coin is worth (say for example 5x1.25) for level 2 and (5x1.5) for level 3 etc. The twist of the game is that unlike regular rogue-likes, if you lose, your score is remembered as 0. That is unless, you play again and reach the same level as you did before. In which case all the loot score (only loot score) is refunded to you. The only way to "cash out" your score is to leave the dungeon via an option after entering a new level. Essentially making each level a "double or nothing" gamble.
+
+-Inventory system : Loot (score gaining items) should vary in terms of rarity and score worth. Loot can also consist of consumables (potions, etc) that can give health, or temporarily boost score gain for current level etc. A character will have 4 special slots, helmet, armour, weapon and charm. There should be a variety of helmet drops, armour, weapons and charms that vary in rarity and stats that scale with the level of the dungeon.
+
+-Combat system : This I actually don't know. I want to use the stats gained from gear and special slots but I have no idea what combat system is both realistic to develop and fun to play. Real time combat could be challenging to develop. Path finding and AI of enemies seems hard to me. My best guess is some very simplified variation of D&D combat?
+Other than that I would like potential traps or failed puzzles being capable of hurting the player and possibly resulting in a death.
+
+-Level generating system : Each level should randomly generate. Basically a given level is a combination of rooms and corridors to other rooms. Im imagining a table of rooms and we randomly select a room type for each room generated in a level. But the problem is say we have a room that needs a key for a corridor, we have to make sure to generate the key in a room that IS accessible to the player (not behind the locked corridor). Stuff like that will make this tricky. The player must also therefore be able to interact with these so we have to make a system that allows the player to interact with certain objects. And detect what they want to interact with.

@@ -1,0 +1,12 @@
+# Compiled class files
+bin/
+
+# macOS
+.DS_Store
+
+# IDE
+.classpath
+.project
+.settings/
+*.iml
+.idea/
