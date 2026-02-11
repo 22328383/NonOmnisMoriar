@@ -1,19 +1,14 @@
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import util.GameObject;
 import util.Point3f;
 import util.Vector3f;
 
 public class Model {
-	private int Money = 0;
-	private boolean isFishing = false;
     private GameObject player;
     private Controller controller = Controller.getInstance();
     private int score = 0;
-    private int[][] room;
-   
+    private Tile[][] room;
+    private int playerX;
+    private int playerY;
 
     public Model() {
         player = new GameObject(
@@ -27,62 +22,105 @@ public class Model {
                 )
         );
 
-        room = new int[GameConstants.GRID_SIZE][GameConstants.GRID_SIZE];
+        room = new Tile[GameConstants.GRID_SIZE][GameConstants.GRID_SIZE];
         for(int i = 0; i < GameConstants.GRID_SIZE; i++) {
             for(int j = 0; j < GameConstants.GRID_SIZE; j++) {
                 if(i == 0 || i == GameConstants.GRID_SIZE - 1 || j == 0 || j == GameConstants.GRID_SIZE - 1) {
-                    room[i][j] = 0;
+                    room[i][j] = Tile.VOID;
                 } else if(i == 1 || i == GameConstants.GRID_SIZE - 2 || j == 1 || j == GameConstants.GRID_SIZE - 2) {
-                    room[i][j] = 1;
+                    room[i][j] = Tile.WALL;
                 } else {
-                    room[i][j] = 2;
+                    room[i][j] = Tile.FLOOR;
                 }
             }
         }
     }
 
-    // This is the heart of the game: the model takes in all inputs,
-    // decides outcomes, and updates the model accordingly.
     public void gamelogic() {
-        // Player logic first
         playerLogic();
-
-        // Interactions between objects
-        gameLogic();
     }
 
-    private void gameLogic() {
-        // Increment across the array list
+    public void computeLocation() {
+        playerX = (int) (player.getCentre().getX() / GameConstants.TILE_SIZE);
+        playerY = (int) (player.getCentre().getY() / GameConstants.TILE_SIZE);
+    }
 
-        // See if they hit anything
-        // Using enhanced for-loop style as it makes it easier to read
+    public int getPlayerX() {
+        return playerX;
+    }
+
+    public int getPlayerY() {
+        return playerY;
+    }
+
+    public Tile roomRight() {
+        computeLocation();
+        if(playerX + 1 < GameConstants.GRID_SIZE) {
+            return room[playerX+1][playerY];
+        } else {
+            return Tile.NOTHING;
+        }
+    }
+
+    public Tile roomLeft() {
+        computeLocation();
+        if(playerX - 1 >= 0) {
+            return room[playerX-1][playerY];
+        } else {
+            return Tile.NOTHING;
+        }
+    }
+
+    public Tile roomDown() {
+        computeLocation();
+        if(playerY + 1 < GameConstants.GRID_SIZE) {
+            return room[playerX][playerY+1];
+        } else {
+            return Tile.NOTHING;
+        }
+    }
+
+    public Tile roomUp() {
+        computeLocation();
+        if(playerY - 1 >= 0) {
+            return room[playerX][playerY-1];
+        } else {
+            return Tile.NOTHING;
+        }
     }
 
     private void playerLogic() {
         if(controller.isKeyAPressed()) {
-            player.getCentre().ApplyVector(new Vector3f(-GameConstants.TILE_SIZE, 0, 0));
             Controller.getInstance().setKeyAPressed(false);
+            if(roomLeft() == Tile.FLOOR) {
+                player.getCentre().ApplyVector(new Vector3f(-GameConstants.TILE_SIZE, 0, 0));
+            }
         }
 
         if(controller.isKeyDPressed()) {
-            player.getCentre().ApplyVector(new Vector3f(GameConstants.TILE_SIZE, 0, 0));
             Controller.getInstance().setKeyDPressed(false);
+            if(roomRight() == Tile.FLOOR) {
+                player.getCentre().ApplyVector(new Vector3f(GameConstants.TILE_SIZE, 0, 0));
+            }
         }
 
         if(controller.isKeyWPressed()) {
-            player.getCentre().ApplyVector(new Vector3f(0, GameConstants.TILE_SIZE, 0));
             Controller.getInstance().setKeyWPressed(false);
+            if(roomUp() == Tile.FLOOR) {
+                player.getCentre().ApplyVector(new Vector3f(0, GameConstants.TILE_SIZE, 0));
+            }
         }
 
         if(controller.isKeySPressed()) {
-            player.getCentre().ApplyVector(new Vector3f(0, -GameConstants.TILE_SIZE, 0));
             Controller.getInstance().setKeySPressed(false);
-        }
-        if(controller.isKeySpacePressed()) {
-        	castRod();
-        	Controller.getInstance().setKeySpacePressed(false);
+            if(roomDown() == Tile.FLOOR) {
+                player.getCentre().ApplyVector(new Vector3f(0, -GameConstants.TILE_SIZE, 0));
+            }
         }
 
+        if(controller.isKeySpacePressed()) {
+            Controller.getInstance().setKeySpacePressed(false);
+        }
     }
 
     public GameObject getPlayer() {
@@ -90,21 +128,10 @@ public class Model {
     }
 
     public int getScore() {
-        return Money;
+        return score;
     }
 
-    private void castRod() {
-        if(!isFishing) {
-            isFishing = true;
-            System.out.println("Rod cast!");
-        } else {
-            isFishing = false;
-            System.out.println("Reeled in!");
-            Money = Money + 10;
-        }
-    }
-
-    public int[][] getRoom() {
-    	return room;
+    public Tile[][] getRoom() {
+        return room;
     }
 }

@@ -54,19 +54,22 @@ public class Viewer extends JPanel {
     }
 
     private void drawRoom(Graphics g) {
-        int[][] tiles = gameworld.getRoom();
-        for(int i = 0; i < GameConstants.GRID_SIZE; i++) {
-            for(int j = 0; j < GameConstants.GRID_SIZE; j++) {
+        Tile[][] tiles = gameworld.getRoom();
+        for (int i = 0; i < GameConstants.GRID_SIZE; i++) {
+            for (int j = 0; j < GameConstants.GRID_SIZE; j++) {
                 String texturePath;
-                switch(tiles[i][j]) {
-                case 0:
+                switch (tiles[i][j]) {
+                case VOID:
                     texturePath = GameConstants.VOID_TEXTURE;
                     break;
-                case 1:
+                case FLOOR:
                     texturePath = GameConstants.FLOOR_TEXTURE;
                     break;
-                case 2:
+                case WALL:
                     texturePath = GameConstants.WALL_TEXTURE;
+                    break;
+                case DOOR:
+                    texturePath = GameConstants.DOOR_TEXTURE;
                     break;
                 default:
                     texturePath = GameConstants.VOID_TEXTURE;
