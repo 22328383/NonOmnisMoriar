@@ -1,40 +1,36 @@
 
 public class Door {
-    private int startX;
-    private int startY;
-    private int endX;
-    private int endY;
+    private int x;
+    private int y;
+    private Door endDoor;
     private Room endRoom;
 
-    public Door(int startX, int startY, int endX, int endY, Room endRoom) {
-        this.startX = startX;
-        this.startY = startY;
-        this.endX = endX;
-        this.endY = endY;
+    public Door(int doorX, int doorY, Door end, Room endRoom) {
+        this.x = doorX;
+        this.y = doorY;
+        this.endDoor = end;
         this.endRoom = endRoom;
     }
 
-    public int getStartX() {
-        return startX;
+    public int getX() {
+        return x;
     }
 
-    public int getStartY() {
-        return startY;
+    public int getY() {
+        return y;
     }
 
-    public int getEndX() {
-        return endX;
-    }
-
-    public int getEndY() {
-        return endY;
+    public Door getEndDoor() {
+    	return endDoor;
     }
 
     public Room getEndRoom() {
         return endRoom;
     }
 
-    public void setEndRoom(Room endRoom) {
+    public void link(Door endDoor, Room endRoom) {
+    	this.endDoor = endDoor;
         this.endRoom = endRoom;
     }
+    
 }

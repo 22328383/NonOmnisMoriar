@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Important: Tutor Mode
+
+The user is learning game development. Do NOT write large chunks of code for them. Instead:
+- Explain concepts and approaches
+- Point out bugs and explain why they happen
+- Give small illustrative snippets, not copy-paste solutions
+- Only write boilerplate/tedious code when explicitly asked
+- Let the user do the conceptual and architectural work themselves
+
 ## Build & Run
 
 This is an Eclipse Java SE 1.8 project with no external dependencies (only java.awt, javax.swing, javax.imageio). There is no Maven/Gradle build system.
@@ -14,48 +23,97 @@ javac -d bin src/util/*.java src/*.java
 java -cp bin MainWindow
 ```
 
-Resource paths (e.g. `"res/assets/hero.png"`, `"res/spacebackground.png"`) are relative to the working directory, not the classpath. The game will fail to load textures if not run from the project root.
+Resource paths are relative to the working directory, not the classpath. The game will fail to load textures if not run from the project root.
 
 There is no test suite. `util/UnitTests.java` only contains a frame-rate check that logs to stdout at runtime.
 
+## Game: Non Omnis Moriar (NOM)
+
+A tile-based roguelike dungeon crawler. The goal is to get a high score by exploring procedurally generated dungeon levels, looting, fighting enemies, and deciding when to "cash out" or risk going deeper.
+
+### Core Design (from idea_2.txt)
+
+- **Scoring system**: All actions give score. Score multiplier increases with dungeon depth. If you die, score resets to 0 UNLESS you reach the same level again (loot score gets refunded). Only way to bank score is to leave the dungeon voluntarily between levels. "Double or nothing" gambling feel.
+- **Inventory**: Loot varies by rarity and score value. Consumables (potions etc). 4 equipment slots: helmet, armour, weapon, charm. Gear scales with dungeon level.
+- **Combat**: Turn-based bump combat (move into enemy tile to attack). Damage based on gear stats. Enemies move one tile toward player per turn.
+- **Level generation**: Each level is a graph of rooms connected by doors. Rooms are individual screens (no scrolling). Procedurally generated with random layouts.
+
+### What's Done
+
+- Tile-based grid rendering (20x20, 50px tiles)
+- Player movement (one tile per keypress, WASD)
+- Wall collision (checks tile type before moving)
+- Tile enum (NOTHING, VOID, FLOOR, WALL, DOOR)
+- TextureCache (HashMap-based, loads images once)
+- GameConstants (centralized config)
+- Room class with grid generation
+- Level class (holds rooms, tracks current room)
+- Model wired to use Level -> Room -> Tile[][] chain
+- Door class (start position, end room, end position)
+- DCSS tileset integrated for dungeon art
+
+### What's Next (in priority order)
+
+1. **Door placement and room transitions** — place DOOR tiles on walls, walk into them to swap rooms
+2. **Random room generation** — randomize interior layouts (scatter walls, vary shapes)
+3. **Multiple rooms per level with graph connections**
+4. **Enemies on tiles** — spawn enemies, bump combat
+5. **Items and inventory** — loot drops, equipment slots
+6. **Scoring system** — the double-or-nothing mechanic
+7. **Level progression** — stairs down, new level generation, depth multiplier
+8. **Polish** — start screen, death screen, score display, balancing
+
 ## Architecture
 
-The game follows an **MVC pattern** coordinated by `MainWindow`:
+MVC pattern coordinated by `MainWindow`:
 
-- **MainWindow** — Entry point. Creates the JFrame (1000x1000), shows a start menu, then runs an infinite game loop at 100 FPS. Each tick calls `Model.gamelogic()` then `Viewer.updateview()`.
-- **Model** — Game state and logic. Owns the player `GameObject`, processes input from `Controller`, handles movement and the fishing mechanic. The `gameLogic()` method (object interactions) is a stub.
-- **Viewer** — Extends `JPanel`. Draws the background and player sprite with sprite-sheet animation (4 frames, 32px wide each, cycling every 40 ticks). Reloads images from disk every frame.
-- **Controller** — Singleton `KeyListener`. Tracks static boolean flags for WASD + Space. Model polls these flags each frame; Space is manually reset after consumption.
+- **MainWindow** — Entry point. JFrame (1000x1000), start menu, game loop at 60 FPS. Calls `Model.gamelogic()` then `Viewer.updateview()`.
+- **Model** — Game state and logic. Owns the player `GameObject`, a `LinkedList<Level>` (the dungeon), and a reference to the current `Room`. Processes input from `Controller`, handles movement with tile collision.
+- **Viewer** — Extends `JPanel`. Draws the current room's tile grid and the player sprite using `TextureCache`.
+- **Controller** — Singleton `KeyListener`. Tracks boolean flags for WASD + Space. Model resets flags after consuming them (one move per keypress).
+- **TextureCache** — HashMap<String, Image> that loads each image from disk once and caches it.
+- **GameConstants** — All magic numbers: window size, grid size, tile size, FPS, texture paths.
+
+### Game World Structure
+
+```
+Model
+  -> LinkedList<Level> dungeon    (all levels in the dungeon)
+  -> Room room                    (current room reference)
+
+Level
+  -> LinkedList<Room> allRooms    (all rooms in this level)
+  -> Room currentRoom             (which room player is in)
+  -> int levelNumber
+
+Room
+  -> Tile[][] grid                (the 20x20 tile map)
+  -> LinkedList<Door> doors       (connections to other rooms)
+  -> generateRoom()               (fills the grid, to be expanded)
+
+Door
+  -> startX, startY               (position in this room)
+  -> endX, endY                   (where player appears in target room)
+  -> endRoom                      (which room this leads to)
+```
 
 ### util package
 
-- **GameObject** — Wraps a position (`Point3f`), dimensions, and a texture file path. Falls back to `res/blankSprite.png` if untextured.
-- **Point3f** — 3D position with `ApplyVector()` that clamps coordinates to 0–900. Note: `ApplyVector` **negates Y and Z** (`y - vector.y`), so positive W vector = upward movement on screen.
+- **GameObject** — Wraps a position (`Point3f`), dimensions, and a texture file path.
+- **Point3f** — 3D position with `ApplyVector()` that clamps coordinates to 0–950. Note: `ApplyVector` **negates Y and Z** (`y - vector.y`), so positive W vector = upward movement on screen.
 - **Vector3f** — 3D vector with arithmetic, dot/cross product, normalization.
 
-### Key constants
+### Key Constants (in GameConstants.java)
 
 | Constant | Value |
 |---|---|
 | Window size | 1000x1000 |
-| World boundary | 0–900 (enforced in `Point3f`) |
-| Target FPS | 100 (10ms/frame) |
-| Player size | 128x128 |
-| Player start | (500, 500, 0) |
-| Movement speed | 2 px/frame |
-| Sprite animation | 4 frames, 32px each, 10 ticks per frame |
-
-### Game mechanics
-
-the main game loop is going to the water and clicking on the water to cast your rod.
-then letting go of the left click once a fish is caught. then depending on your
-rod and other factors we can add later (weather, bait type, items etc etc) we rng
-a random fish/loot fished up and generate a weight associated with it. items and fish
-have different rarity so it should feel like gambiling.
-based on the fish you caught, the price of the fish is determined by the weight and rarity of the item.
-with the money you can buy better gear to increase odds or asthetics. the game ends when you collect
-enough money to "prestige" permanently making your odds better but reseting all progress.
+| Grid size | 20x20 tiles |
+| Tile size | 50px |
+| World boundary | 0–950 (in Point3f) |
+| Target FPS | 60 |
+| Player start | tile (10, 10) |
 
 ### Source files have no package declaration
 
-`MainWindow`, `Model`, `Viewer`, and `Controller` are in the default package (no package statement). Only the `util/` classes use `package util;`.
+All game classes are in the default package. Only `util/` classes use `package util;`. Classes in `util` cannot import from the default package (Java limitation).
