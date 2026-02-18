@@ -14,6 +14,7 @@ public class Model {
     private int playerX;
     private int playerY;
 	private LinkedList<Level> dungeon = new LinkedList<Level>();
+	private LinkedList<String> log = new LinkedList<String>();
 	static private Random r = new Random();
 
     public Model() {
@@ -27,6 +28,7 @@ public class Model {
                     0
                 )
         );
+        addLog("Welcome to Non Omnis Moriar");
         Level newLevel = new Level(currLevel);
         dungeon.add(newLevel);
         room = newLevel.getCurrentRoom();
@@ -93,6 +95,11 @@ public class Model {
             switch(roomLeft()) {
             case FLOOR:
             	player.getCentre().ApplyVector(new Vector3f(-GameConstants.TILE_SIZE, 0, 0));
+            	int mobIdx = encounterMob();
+            	if(mobIdx >= 0) {
+            		attackMob(mobIdx);
+            		player.getCentre().ApplyVector(new Vector3f(GameConstants.TILE_SIZE, 0, 0));
+            	}
             	break;
             case DOOR:
             	player.getCentre().ApplyVector(new Vector3f(-GameConstants.TILE_SIZE, 0, 0));
@@ -108,6 +115,11 @@ public class Model {
             switch(roomRight()) {
             case FLOOR:
             	player.getCentre().ApplyVector(new Vector3f(GameConstants.TILE_SIZE, 0, 0));
+            	int mobIdx = encounterMob();
+            	if(mobIdx >= 0) {
+            		attackMob(mobIdx);
+            		player.getCentre().ApplyVector(new Vector3f(-GameConstants.TILE_SIZE, 0, 0));
+            	}
             	break;
             case DOOR:
             	player.getCentre().ApplyVector(new Vector3f(GameConstants.TILE_SIZE, 0, 0));
@@ -123,6 +135,11 @@ public class Model {
             switch(roomUp()) {
             case FLOOR:
             	player.getCentre().ApplyVector(new Vector3f(0, GameConstants.TILE_SIZE, 0));
+            	int mobIdx = encounterMob();
+            	if(mobIdx >= 0) {
+            		attackMob(mobIdx);
+            		player.getCentre().ApplyVector(new Vector3f(0, -GameConstants.TILE_SIZE, 0));
+            	}
             	break;
             case DOOR:
             	player.getCentre().ApplyVector(new Vector3f(0, GameConstants.TILE_SIZE, 0));
@@ -138,6 +155,11 @@ public class Model {
             switch(roomDown()) {
             case FLOOR:
             	player.getCentre().ApplyVector(new Vector3f(0, -GameConstants.TILE_SIZE, 0));
+            	int mobIdx = encounterMob();
+            	if(mobIdx >= 0) {
+            		attackMob(mobIdx);
+            		player.getCentre().ApplyVector(new Vector3f(0, GameConstants.TILE_SIZE, 0));
+            	}
             	break;
             case DOOR:
             	player.getCentre().ApplyVector(new Vector3f(0, -GameConstants.TILE_SIZE, 0));
@@ -151,6 +173,29 @@ public class Model {
         if(controller.isKeySpacePressed()) {
             Controller.getInstance().setKeySpacePressed(false);
         }
+    }
+    
+    private int encounterMob() {
+    	LinkedList<Enemy> mobs = room.getMobs();
+    	computeLocation();
+    	for(int i = 0; i < mobs.size(); i++) {
+    		if( (playerX == mobs.get(i).getX()) && (playerY == mobs.get(i).getY()) ) {
+    			return i;
+    		}
+    	}
+    	return -1;
+    }
+
+    private void attackMob(int mobIdx) {
+    	LinkedList<Enemy> mobs = room.getMobs();
+    	Enemy target = mobs.get(mobIdx);
+    	int dmg = 5; //TODO replace with player damage stat later
+    	target.takeDamage(dmg);
+    	addLog("You hit the " + target.getName() + " for " + dmg + " damage.");
+    	if(target.isDead()) {
+    		addLog("The " + target.getName() + " dies!");
+    		mobs.remove(mobIdx);
+    	}
     }
     
     private void doorLogic() {
@@ -175,9 +220,22 @@ public class Model {
 		Room endRoom = room.getDoors().get(onDoor).getEndRoom();
 		Door endDoor = room.getDoors().get(onDoor).getEndDoor();
 		room = endRoom;
+		String logTransition = "You enter room " + currLevel + "-" + (char)('A' + dungeon.get(currLevel).getAllRooms().indexOf(endRoom)) + ".";
+		addLog(logTransition);
 		dungeon.get(currLevel).setCurrentRoom(endRoom);
 		player.getCentre().setX(endDoor.getX() * GameConstants.TILE_SIZE);
 		player.getCentre().setY(endDoor.getY() * GameConstants.TILE_SIZE);
+    }
+    
+    public void addLog(String string) {
+    	if(log.size() >= 8) {
+    		log.removeFirst();
+    	}
+    	log.add(string);
+    }
+    
+    public LinkedList<String> getLog() {
+    	return log;
     }
 
     public GameObject getPlayer() {
@@ -190,6 +248,10 @@ public class Model {
 
     public Tile[][] getRoom() {
         return room.getGrid();
+    }
+
+    public LinkedList<Enemy> getMobs() {
+        return room.getMobs();
     }
     
     static public int getRand(int min, int max) {

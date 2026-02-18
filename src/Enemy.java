@@ -38,6 +38,14 @@ public abstract class Enemy {
 		this.y = y;
 	}
 
+	public String getTexture() {
+		return texture;
+	}
+
+	public String getName() {
+		return name;
+	}
+
 	public void takeDamage(int amount) {
         health -= amount;
     }

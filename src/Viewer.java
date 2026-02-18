@@ -1,9 +1,12 @@
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 
 import java.awt.Image;
 import java.awt.LayoutManager;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -42,6 +45,7 @@ public class Viewer extends JPanel {
 
         // Draw room
         drawRoom(g);
+        drawLog(g);
 
         // Draw player
         int x = (int) gameworld.getPlayer().getCentre().getX();
@@ -50,7 +54,12 @@ public class Viewer extends JPanel {
         int height = (int) gameworld.getPlayer().getHeight();
         String texture = gameworld.getPlayer().getTexture();
 
+        LinkedList<Enemy> mobs = gameworld.getMobs();
+        for(int i = 0; i < mobs.size(); i++) {
+        	g.drawImage(textureCache.getImg(mobs.get(i).getTexture()), mobs.get(i).getX() * GameConstants.TILE_SIZE, mobs.get(i).getY() * GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, null);
+        }
         drawPlayer(x, y, width, height, texture, g);
+
     }
 
     private void drawRoom(Graphics g) {
@@ -86,5 +95,17 @@ public class Viewer extends JPanel {
     private void drawPlayer(int x, int y, int width, int height, String texture, Graphics g) {
         Image playerImg = textureCache.getImg(texture);
         g.drawImage(playerImg, x, y, width, height, null);
+    }
+    
+    private void drawLog(Graphics g) {
+    	g.setColor(Color.BLACK);
+    	g.fillRect(0, (GameConstants.WINDOW_HEIGHT-GameConstants.LOG_HEIGHT), GameConstants.WINDOW_WIDTH, GameConstants.LOG_HEIGHT);
+    	
+    	g.setColor(Color.WHITE);
+    	g.setFont(new Font("Monospaced", Font.PLAIN, 14));
+    	LinkedList<String> log = gameworld.getLog();
+    	for(int i = 0; i < log.size(); i++) {
+    	    g.drawString(log.get(i), 10, GameConstants.WINDOW_HEIGHT - GameConstants.LOG_HEIGHT + 20 + (i * 20));
+    	}
     }
 }

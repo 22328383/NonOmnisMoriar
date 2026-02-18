@@ -146,11 +146,11 @@ public class Room {
 
     private Enemy createEnemy(int tier, int x, int y, int level) {
     	int[][] tierTable = {
-    		{0, 1},      //Common
-    		{},          //Uncommon
-    		{},          //Rare
-    		{},          //Epic
-    		{},          //Legendary
+    		{0, 1},       //Common:    Rat, Slime
+    		{2, 3},       //Uncommon:  Orc, Goblin
+    		{4, 5},       //Rare:      Troll, Knight
+    		{6, 7},       //Epic:      Wizard, Beast
+    		{8, 9},       //Legendary: Drake, Demon
     	};
 
     	int[] pool = tierTable[tier];
@@ -160,12 +160,17 @@ public class Room {
 
     private Enemy buildEnemy(int id, int x, int y, int level) {
     	switch(id) {
-    		case 0:
-    			return new Orc(x, y, level);
-    		case 1:
-    			return new Rat(x, y, level);
-    		default:
-    			return new Rat(x, y, level*id);
+    		case 0:  return new Rat(x, y, level);
+    		case 1:  return new Slime(x, y, level);
+    		case 2:  return new Orc(x, y, level);
+    		case 3:  return new Goblin(x, y, level);
+    		case 4:  return new Troll(x, y, level);
+    		case 5:  return new Knight(x, y, level);
+    		case 6:  return new Wizard(x, y, level);
+    		case 7:  return new Beast(x, y, level);
+    		case 8:  return new Drake(x, y, level);
+    		case 9:  return new Demon(x, y, level);
+    		default: return new Rat(x, y, level);
     	}
     }
 
@@ -181,6 +186,10 @@ public class Room {
 
     public LinkedList<Door> getDoors() {
         return doors;
+    }
+
+    public LinkedList<Enemy> getMobs() {
+        return mobs;
     }
 
     public int getX() {

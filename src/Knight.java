@@ -1,0 +1,7 @@
+
+public class Knight extends Enemy {
+
+	public Knight(int x, int y, int level) {
+		super(x, y, 20 + (4 * level), 6 + (2 * level), 15 + (5 * level), 70, 10, "Knight", GameConstants.KNIGHT_TEXTURE);
+	}
+}
