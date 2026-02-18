@@ -15,5 +15,8 @@ public class GameConstants {
     public static final String FLOOR_TEXTURE = "res/assets/dungeon/wall/stone_brick_1.png";
     public static final String WALL_TEXTURE  = "res/assets/dungeon/wall/catacombs_0.png";
     public static final String DOOR_TEXTURE  = "res/assets/dungeon/doors/closed_door.png";
+    
     public static final String HERO_TEXTURE  = "res/assets/monster/human.png";
+    public static final String ORC_TEXTURE   = "res/assets/monster/orc_old.png";
+    public static final String RAT_TEXTURE   = "res/assets/monster/animals/rat.png";
 }

@@ -29,7 +29,7 @@ There is no test suite. `util/UnitTests.java` only contains a frame-rate check t
 
 ## Game: Non Omnis Moriar (NOM)
 
-A tile-based roguelike dungeon crawler. The goal is to get a high score by exploring procedurally generated dungeon levels, looting, fighting enemies, and deciding when to "cash out" or risk going deeper.
+A tile-based roguelike dungeon crawler. **Due: March 3rd.** The goal is to get a high score by exploring procedurally generated dungeon levels, looting, fighting enemies, and deciding when to "cash out" or risk going deeper.
 
 ### Core Design (from idea_2.txt)
 
@@ -46,22 +46,30 @@ A tile-based roguelike dungeon crawler. The goal is to get a high score by explo
 - Tile enum (NOTHING, VOID, FLOOR, WALL, DOOR)
 - TextureCache (HashMap-based, loads images once)
 - GameConstants (centralized config)
-- Room class with grid generation
+- Room class with grid generation (parameterized rectangular rooms)
 - Level class (holds rooms, tracks current room)
 - Model wired to use Level -> Room -> Tile[][] chain
 - Door class (start position, end room, end position)
 - DCSS tileset integrated for dungeon art
+- Door placement on random wall positions with overlap prevention
+- Room transitions via doors (walk into door tile to swap rooms)
+- Multi-room levels with graph connections (chain + random extra)
+- Random room sizes (borderX/borderY parameters)
+- Enemy system: abstract Enemy base class with Orc and Rat subclasses
+- 5-tier rarity spawn system with level-scaled weights (common→legendary)
+- Linear stat scaling per dungeon level
+- Tier table for sustainable enemy-per-tier management
+- Safe spawn positioning (avoids doors, player start, other mobs)
 
 ### What's Next (in priority order)
 
-1. **Door placement and room transitions** — place DOOR tiles on walls, walk into them to swap rooms
-2. **Random room generation** — randomize interior layouts (scatter walls, vary shapes)
-3. **Multiple rooms per level with graph connections**
-4. **Enemies on tiles** — spawn enemies, bump combat
-5. **Items and inventory** — loot drops, equipment slots
-6. **Scoring system** — the double-or-nothing mechanic
-7. **Level progression** — stairs down, new level generation, depth multiplier
-8. **Polish** — start screen, death screen, score display, balancing
+1. **Draw enemies** — expose mobs to Viewer, render on screen
+2. **Bump combat** — attack enemies by moving into them
+3. **Enemy AI** — enemies move toward player each turn
+4. **Items and inventory** — loot drops, equipment slots
+5. **Scoring system** — the double-or-nothing mechanic
+6. **Level progression** — stairs down, new level generation, depth multiplier
+7. **Polish** — start screen, death screen, score display, balancing
 
 ## Architecture
 
@@ -89,12 +97,20 @@ Level
 Room
   -> Tile[][] grid                (the 20x20 tile map)
   -> LinkedList<Door> doors       (connections to other rooms)
-  -> generateRoom()               (fills the grid, to be expanded)
+  -> LinkedList<Enemy> mobs       (enemies in this room)
+  -> generateRoom()               (fills the grid)
+  -> spawnMobs()                  (tier-based enemy spawning)
+  -> rollTier(level)              (weighted rarity roll)
+  -> createEnemy(tier,x,y,level)  (tier table lookup + buildEnemy)
 
 Door
   -> startX, startY               (position in this room)
   -> endX, endY                   (where player appears in target room)
   -> endRoom                      (which room this leads to)
+
+Enemy (abstract)
+  -> x, y, health, damage, gold, accuracy, critChance, name, texture
+  -> Subclasses: Orc, Rat (stats scale linearly with level)
 ```
 
 ### util package

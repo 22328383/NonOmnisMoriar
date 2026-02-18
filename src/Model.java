@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.Random;
 
 import util.GameObject;
 import util.Point3f;
@@ -13,6 +14,7 @@ public class Model {
     private int playerX;
     private int playerY;
 	private LinkedList<Level> dungeon = new LinkedList<Level>();
+	static private Random r = new Random();
 
     public Model() {
         player = new GameObject(
@@ -188,5 +190,9 @@ public class Model {
 
     public Tile[][] getRoom() {
         return room.getGrid();
+    }
+    
+    static public int getRand(int min, int max) {
+    	return r.nextInt(max - min + 1) + min;
     }
 }

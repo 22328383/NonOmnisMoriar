@@ -7,7 +7,11 @@ public class Level {
 
     public Level(int levelNumber) {
         this.levelNumber = levelNumber;
-        generateRooms();
+        int roomCnt = Model.getRand(2, 8);
+        generateRooms(roomCnt);
+        for(int i = 0; i < allRooms.size(); i++) {
+        	allRooms.get(i).spawnMobs();
+        }
     }
 
     public LinkedList<Room> getAllRooms() {
@@ -25,17 +29,41 @@ public class Level {
     public int getLevelNumber() {
         return levelNumber;
     }
-    
-    private void generateRooms() {
-    	Room room1 = new Room(1);
-    	Room room2 = new Room(3);
-    	allRooms = new LinkedList<Room>();
-    	allRooms.add(room1);
-    	allRooms.add(room2);
-    	room1.addDoor(18, 10, null, null);
-    	room2.addDoor(3, 10, null, null);
-    	room1.getDoors().get(0).link(room2.getDoors().get(0), room2);
-    	room2.getDoors().get(0).link(room1.getDoors().get(0), room1);
-    	currentRoom = room1;
+
+    private void connectRooms(Room roomA, Room roomB) {
+        int[] posA = roomA.getRandomWallPosition();
+        int[] posB = roomB.getRandomWallPosition();
+        if(posA == null || posB == null) {
+            return;
+        }
+        roomA.addDoor(posA[0], posA[1], null, null);
+        roomB.addDoor(posB[0], posB[1], null, null);
+        Door doorA = roomA.getDoors().getLast();
+        Door doorB = roomB.getDoors().getLast();
+        doorA.link(doorB, roomB);
+        doorB.link(doorA, roomA);
+    }
+
+    private void generateRooms(int roomCnt) {
+        allRooms = new LinkedList<Room>();
+        for (int i = 0; i < roomCnt; i++) {
+            int x = Model.getRand(1, 6);
+            int y = Model.getRand(1, 6);
+            Room room = new Room(x, y, levelNumber);
+            allRooms.add(room);
+        }
+        currentRoom = allRooms.get(0);
+
+        for(int i = 0; i < roomCnt - 1; i++) {
+            connectRooms(allRooms.get(i), allRooms.get(i + 1));
+        }
+
+        for(int i = 0; i < roomCnt; i++) {
+            for(int j = i + 2; j < roomCnt; j++) {
+                if(Model.getRand(1, 100) <= 15) {
+                    connectRooms(allRooms.get(i), allRooms.get(j));
+                }
+            }
+        }
     }
 }
