@@ -1,14 +1,19 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
 
 // Singleton pattern
-public class Controller implements KeyListener {
+public class Controller implements KeyListener, MouseListener {
 
 	private static boolean keyAPressed = false;
     private static boolean keySPressed = false;
     private static boolean keyDPressed = false;
     private static boolean keyWPressed = false;
     private static boolean keySpacePressed = false;
+    private static int clickX = -1;
+    private static int clickY = -1;
+    private static boolean clicked = false;
 
     private static final Controller instance = new Controller();
 
@@ -72,6 +77,25 @@ public class Controller implements KeyListener {
                 break;
         }
     }
+    
+    public void mouseClicked(MouseEvent event) {
+        clickX = event.getX()/GameConstants.TILE_SIZE;
+        clickY = event.getY()/GameConstants.TILE_SIZE;
+        clicked = true;
+    }
+    
+    public boolean isClicked() {
+    	return clicked;
+    }
+    public int getClickX() {
+    	return clickX;
+    }
+    public int getClickY() {
+    	return clickY;
+    }
+    public void setClicked(boolean c) {
+    	clicked = c;
+    }
 
     public boolean isKeyAPressed() {
         return keyAPressed;
@@ -112,4 +136,28 @@ public class Controller implements KeyListener {
     public void setKeySpacePressed(boolean keySpacePressed) {
         Controller.keySpacePressed = keySpacePressed;
     }
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }

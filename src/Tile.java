@@ -4,5 +4,6 @@ public enum Tile {
     VOID,
     FLOOR,
     WALL,
+    STAIRS,
     DOOR
 }

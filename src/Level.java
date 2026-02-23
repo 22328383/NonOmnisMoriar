@@ -50,6 +50,9 @@ public class Level {
             int x = Model.getRand(1, 6);
             int y = Model.getRand(1, 6);
             Room room = new Room(x, y, levelNumber);
+            if(i == roomCnt - 1) {
+            	room.makeStairs();
+            }
             allRooms.add(room);
         }
         currentRoom = allRooms.get(0);

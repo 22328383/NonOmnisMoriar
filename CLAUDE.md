@@ -40,10 +40,10 @@ A tile-based roguelike dungeon crawler. **Due: March 3rd.** The goal is to get a
 
 ### What's Done
 
-- Tile-based grid rendering (20x20, 50px tiles)
-- Player movement (one tile per keypress, WASD)
+- Tile-based grid rendering (20x20, 40px tiles, 800x800 game area)
+- Player movement (one tile per keypress, WASD + Space for idle turn)
 - Wall collision (checks tile type before moving)
-- Tile enum (NOTHING, VOID, FLOOR, WALL, DOOR)
+- Tile enum (NOTHING, VOID, FLOOR, WALL, STAIRS, DOOR)
 - TextureCache (HashMap-based, loads images once)
 - GameConstants (centralized config)
 - Room class with grid generation (parameterized rectangular rooms)
@@ -55,30 +55,35 @@ A tile-based roguelike dungeon crawler. **Due: March 3rd.** The goal is to get a
 - Room transitions via doors (walk into door tile to swap rooms)
 - Multi-room levels with graph connections (chain + random extra)
 - Random room sizes (borderX/borderY parameters)
-- Enemy system: abstract Enemy base class with Orc and Rat subclasses
+- Enemy system: abstract Enemy base class with 10 subclasses (Rat, Slime, Orc, Goblin, Troll, Knight, Wizard, Beast, Drake, Demon)
 - 5-tier rarity spawn system with level-scaled weights (common→legendary)
 - Linear stat scaling per dungeon level
 - Tier table for sustainable enemy-per-tier management
 - Safe spawn positioning (avoids doors, player start, other mobs)
+- Enemy rendering in Viewer via TextureCache
+- Bump combat with bounce-back effect (move into enemy, attack, bounce back)
+- Enemy AI: vision-based chasing with speed roll, random wandering when idle
+- Player class extracted from Model (owns sprite, HP, damage, tile position)
+- Text log system (8-line scrolling log, 200px black bar at bottom of screen)
+- Click-to-inspect system (MouseListener on Controller, click tiles/mobs/doors for info)
+- Level progression via stairs (STAIRS tile in last room, descend to generate new level)
+- Death detection with game over state
 
 ### What's Next (in priority order)
 
-1. **Draw enemies** — expose mobs to Viewer, render on screen
-2. **Bump combat** — attack enemies by moving into them
-3. **Enemy AI** — enemies move toward player each turn
-4. **Items and inventory** — loot drops, equipment slots
-5. **Scoring system** — the double-or-nothing mechanic
-6. **Level progression** — stairs down, new level generation, depth multiplier
-7. **Polish** — start screen, death screen, score display, balancing
+1. **Items and inventory** — loot drops, equipment slots, consumables
+2. **Scoring system** — the double-or-nothing mechanic, score multiplier with depth
+3. **Polish** — start screen, death screen, score display, HP display, balancing
 
 ## Architecture
 
 MVC pattern coordinated by `MainWindow`:
 
-- **MainWindow** — Entry point. JFrame (1000x1000), start menu, game loop at 60 FPS. Calls `Model.gamelogic()` then `Viewer.updateview()`.
-- **Model** — Game state and logic. Owns the player `GameObject`, a `LinkedList<Level>` (the dungeon), and a reference to the current `Room`. Processes input from `Controller`, handles movement with tile collision.
-- **Viewer** — Extends `JPanel`. Draws the current room's tile grid and the player sprite using `TextureCache`.
-- **Controller** — Singleton `KeyListener`. Tracks boolean flags for WASD + Space. Model resets flags after consuming them (one move per keypress).
+- **MainWindow** — Entry point. JFrame (800x1000), start menu, game loop at 60 FPS. Calls `Model.gamelogic()` then `Viewer.updateview()`.
+- **Model** — Game state and logic. Owns a `Player`, a `LinkedList<Level>` (the dungeon), and a reference to the current `Room`. Handles player movement, bump combat, enemy AI, click inspection, door transitions, and level progression.
+- **Viewer** — Extends `JPanel`. Draws the current room's tile grid, enemies, player sprite, and text log using `TextureCache`.
+- **Controller** — Singleton `KeyListener` + `MouseListener`. Tracks boolean flags for WASD + Space + mouse clicks. Model resets flags after consuming them (one move per keypress).
+- **Player** — Owns sprite (`GameObject`), HP, damage, tile position. Extracted from Model.
 - **TextureCache** — HashMap<String, Image> that loads each image from disk once and caches it.
 - **GameConstants** — All magic numbers: window size, grid size, tile size, FPS, texture paths.
 
@@ -109,8 +114,9 @@ Door
   -> endRoom                      (which room this leads to)
 
 Enemy (abstract)
-  -> x, y, health, damage, gold, accuracy, critChance, name, texture
-  -> Subclasses: Orc, Rat (stats scale linearly with level)
+  -> x, y, health, damage, gold, accuracy, critChance, vision, speed, name, texture
+  -> 10 subclasses: Rat, Slime, Orc, Goblin, Troll, Knight, Wizard, Beast, Drake, Demon
+  -> All stats scale linearly with dungeon level
 ```
 
 ### util package
@@ -123,10 +129,10 @@ Enemy (abstract)
 
 | Constant | Value |
 |---|---|
-| Window size | 1000x1000 |
+| Window size | 800x1000 (800 game + 200 log) |
 | Grid size | 20x20 tiles |
-| Tile size | 50px |
-| World boundary | 0–950 (in Point3f) |
+| Tile size | 40px |
+| World boundary | 0–760 (in Point3f) |
 | Target FPS | 60 |
 | Player start | tile (10, 10) |
 

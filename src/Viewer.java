@@ -48,11 +48,11 @@ public class Viewer extends JPanel {
         drawLog(g);
 
         // Draw player
-        int x = (int) gameworld.getPlayer().getCentre().getX();
-        int y = (int) gameworld.getPlayer().getCentre().getY();
-        int width = (int) gameworld.getPlayer().getWidth();
-        int height = (int) gameworld.getPlayer().getHeight();
-        String texture = gameworld.getPlayer().getTexture();
+        int x = (int) gameworld.getPlayer().getSprite().getCentre().getX();
+        int y = (int) gameworld.getPlayer().getSprite().getCentre().getY();
+        int width = (int) gameworld.getPlayer().getSprite().getWidth();
+        int height = (int) gameworld.getPlayer().getSprite().getHeight();
+        String texture = gameworld.getPlayer().getSprite().getTexture();
 
         LinkedList<Enemy> mobs = gameworld.getMobs();
         for(int i = 0; i < mobs.size(); i++) {
@@ -80,6 +80,9 @@ public class Viewer extends JPanel {
                 case DOOR:
                     texturePath = GameConstants.DOOR_TEXTURE;
                     break;
+                case STAIRS:
+                	texturePath = GameConstants.STAIRS_TEXTURE;
+                	break;
                 default:
                     texturePath = GameConstants.VOID_TEXTURE;
                     break;

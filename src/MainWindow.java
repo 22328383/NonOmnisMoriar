@@ -20,7 +20,7 @@ public class MainWindow {
     private static Model gameworld = new Model();
     private static Viewer canvas = new Viewer(gameworld);
 
-    private KeyListener controller = new Controller();
+    private Controller controller = new Controller();
 
     private static boolean startGame = false;
 
@@ -43,6 +43,7 @@ public class MainWindow {
                 startMenuButton.setVisible(false);
                 canvas.setVisible(true);
                 canvas.addKeyListener(controller);
+                canvas.addMouseListener(controller);
                 canvas.requestFocusInWindow();
                 startGame = true;
             }

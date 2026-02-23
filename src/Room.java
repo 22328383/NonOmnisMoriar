@@ -106,7 +106,7 @@ public class Room {
     	}
     }
 
-    private int[] getRandomFloorPosition() {
+    public int[] getRandomFloorPosition() {
     	for(int attempt = 0; attempt < 30; attempt++) {
     		int rx = Model.getRand(X + 1, GameConstants.GRID_SIZE - X - 2);
     		int ry = Model.getRand(Y + 1, GameConstants.GRID_SIZE - Y - 2);
@@ -199,4 +199,12 @@ public class Room {
     public int getY() {
     	return Y;
     }
+
+	public void makeStairs() {
+		int[] stairs = getRandomFloorPosition();
+		while(stairs == null) {
+			stairs = getRandomFloorPosition();
+		}
+		grid[stairs[0]][stairs[1]] = Tile.STAIRS;
+	}
 }

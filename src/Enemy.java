@@ -7,10 +7,12 @@ public abstract class Enemy {
     protected int gold;
     protected int accuracy;
     protected int critChance;
+    protected int vision;
+    protected int speed;
     protected String name;
     protected String texture;
 
-    public Enemy(int x, int y, int health, int damage, int gold, int accuracy, int critChance, String name, String texture) {
+    public Enemy(int x, int y, int health, int damage, int gold, int accuracy, int critChance, int vision, int speed, String name, String texture) {
         this.x = x;
         this.y = y;
         this.health = health;
@@ -18,6 +20,8 @@ public abstract class Enemy {
         this.gold = gold;
         this.accuracy = accuracy;
         this.critChance = critChance;
+        this.vision = vision;
+        this.speed = speed;
         this.name = name;
         this.texture = texture;
     }
@@ -46,12 +50,32 @@ public abstract class Enemy {
 		return name;
 	}
 
+	public int getDamage() {
+		return damage;
+	}
+
+	public int getHealth() {
+		return health;
+	}
+
 	public void takeDamage(int amount) {
         health -= amount;
     }
 
     public boolean isDead() {
         return health <= 0;
+    }
+    
+    public int distToPlayer(int playerX, int playerY) {
+    	return (Math.abs(x - playerX) + Math.abs(y - playerY));
+    }
+    
+    public int getVision() {
+    	return vision;
+    }
+
+    public int getSpeed() {
+    	return speed;
     }
     
 }
