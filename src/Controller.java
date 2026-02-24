@@ -1,3 +1,4 @@
+import core.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
@@ -11,6 +12,7 @@ public class Controller implements KeyListener, MouseListener {
     private static boolean keyDPressed = false;
     private static boolean keyWPressed = false;
     private static boolean keySpacePressed = false;
+    private static boolean keyIPressed = false;
     private static int clickX = -1;
     private static int clickY = -1;
     private static boolean clicked = false;
@@ -48,6 +50,9 @@ public class Controller implements KeyListener, MouseListener {
             case ' ':
                 setKeySpacePressed(true);
                 break;
+            case 'i':
+            	setKeyIPressed(true);
+            	break;
             default:
                 // Unknown key
                 break;
@@ -72,6 +77,9 @@ public class Controller implements KeyListener, MouseListener {
             case ' ':
                 setKeySpacePressed(false);
                 break;
+            case 'i':
+            	setKeyIPressed(false);
+            	break;
             default:
                 // Unknown key
                 break;
@@ -135,6 +143,14 @@ public class Controller implements KeyListener, MouseListener {
 
     public void setKeySpacePressed(boolean keySpacePressed) {
         Controller.keySpacePressed = keySpacePressed;
+    }
+    
+    public boolean isKeyIPressed() {
+    	return keyIPressed;
+    }
+    
+    public void setKeyIPressed(boolean keyIPressed) {
+    	Controller.keyIPressed = keyIPressed;
     }
 
 	@Override

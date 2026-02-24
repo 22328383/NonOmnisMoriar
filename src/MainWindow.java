@@ -1,3 +1,4 @@
+import core.*;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -88,8 +89,5 @@ public class MainWindow {
 
         // View update
         canvas.updateview();
-
-        // Score update
-        frame.setTitle("Money = " + gameworld.getScore());
     }
 }

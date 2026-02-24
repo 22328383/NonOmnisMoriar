@@ -25,6 +25,10 @@ public class Level {
     public void setCurrentRoom(Room room) {
         this.currentRoom = room;
     }
+    
+    public void resetRoom() {
+    	this.currentRoom = allRooms.get(0);
+    }
 
     public int getLevelNumber() {
         return levelNumber;
@@ -46,25 +50,35 @@ public class Level {
 
     private void generateRooms(int roomCnt) {
         allRooms = new LinkedList<Room>();
-        for (int i = 0; i < roomCnt; i++) {
+        for(int i = 0; i < roomCnt; i++) {
             int x = Model.getRand(1, 6);
             int y = Model.getRand(1, 6);
             Room room = new Room(x, y, levelNumber);
-            if(i == roomCnt - 1) {
-            	room.makeStairs();
-            }
             allRooms.add(room);
         }
         currentRoom = allRooms.get(0);
 
+        // connect doors first
         for(int i = 0; i < roomCnt - 1; i++) {
             connectRooms(allRooms.get(i), allRooms.get(i + 1));
         }
-
         for(int i = 0; i < roomCnt; i++) {
             for(int j = i + 2; j < roomCnt; j++) {
                 if(Model.getRand(1, 100) <= 15) {
                     connectRooms(allRooms.get(i), allRooms.get(j));
+                }
+            }
+        }
+
+        // place stairs and exit after doors exist
+        allRooms.getLast().makeStairs();
+        boolean exitPlaced = false;
+        for(int i = 0; i < roomCnt; i++) {
+            if(!exitPlaced) {
+                int exitPlace = Model.getRand(1, roomCnt);
+                if(exitPlace <= (i + 1)) {
+                    allRooms.get(i).makeExit();
+                    exitPlaced = true;
                 }
             }
         }

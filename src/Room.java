@@ -1,7 +1,11 @@
 import java.util.LinkedList;
+import mobs.*;
+import core.*;
+import props.*;
 
 public class Room {
     private Tile[][] grid;
+    private Occupant[][] occupants;
     private LinkedList<Door> doors;
     private LinkedList<Enemy> mobs = new LinkedList<Enemy>();
     private int X;
@@ -11,6 +15,7 @@ public class Room {
     public Room(int sizeX, int sizeY, int level) {
         doors = new LinkedList<Door>();
         grid = new Tile[GameConstants.GRID_SIZE][GameConstants.GRID_SIZE];
+        occupants = new Occupant[GameConstants.GRID_SIZE][GameConstants.GRID_SIZE];
         generateRoom(sizeX, sizeY);
         X = sizeX;
         Y = sizeY;
@@ -101,6 +106,7 @@ public class Room {
     			Enemy mob = createEnemy(tier, pos[0], pos[1], level);
     			if(mob != null) {
     				mobs.add(mob);
+    				occupants[pos[0]][pos[1]] = mob;
     			}
     		}
     	}
@@ -128,14 +134,7 @@ public class Room {
     		if(nearDoor) {
     			continue;
     		}
-    		boolean occupied = false;
-    		for(int i = 0; i < mobs.size(); i++) {
-    			if(mobs.get(i).getX() == rx && mobs.get(i).getY() == ry) {
-    				occupied = true;
-    				break;
-    			}
-    		}
-    		if(occupied) {
+    		if(occupants[rx][ry] != null) {
     			continue;
     		}
 
@@ -160,17 +159,17 @@ public class Room {
 
     private Enemy buildEnemy(int id, int x, int y, int level) {
     	switch(id) {
-    		case 0:  return new Rat(x, y, level);
-    		case 1:  return new Slime(x, y, level);
-    		case 2:  return new Orc(x, y, level);
-    		case 3:  return new Goblin(x, y, level);
-    		case 4:  return new Troll(x, y, level);
-    		case 5:  return new Knight(x, y, level);
-    		case 6:  return new Wizard(x, y, level);
-    		case 7:  return new Beast(x, y, level);
-    		case 8:  return new Drake(x, y, level);
-    		case 9:  return new Demon(x, y, level);
-    		default: return new Rat(x, y, level);
+    		case 0:  return new Rat(x, y, level, GameConstants.RAT_TEXTURE);
+    		case 1:  return new Slime(x, y, level, GameConstants.SLIME_TEXTURE);
+    		case 2:  return new Orc(x, y, level, GameConstants.ORC_TEXTURE);
+    		case 3:  return new Goblin(x, y, level, GameConstants.GOBLIN_TEXTURE);
+    		case 4:  return new Troll(x, y, level, GameConstants.TROLL_TEXTURE);
+    		case 5:  return new Knight(x, y, level, GameConstants.KNIGHT_TEXTURE);
+    		case 6:  return new Wizard(x, y, level, GameConstants.WIZARD_TEXTURE);
+    		case 7:  return new Beast(x, y, level, GameConstants.BEAST_TEXTURE);
+    		case 8:  return new Drake(x, y, level, GameConstants.DRAKE_TEXTURE);
+    		case 9:  return new Demon(x, y, level, GameConstants.DEMON_TEXTURE);
+    		default: return new Rat(x, y, level, GameConstants.RAT_TEXTURE);
     	}
     }
 
@@ -199,6 +198,19 @@ public class Room {
     public int getY() {
     	return Y;
     }
+    
+    public void setOccupant(int x, int y, Occupant o) {
+    	occupants[x][y] = o;
+    }
+    public Occupant getOccupant(int x, int y) {
+    	return occupants[x][y];
+    }
+    public void clearOccupant(int x, int y) {
+    	occupants[x][y] = null;
+    }
+    public Occupant[][] getOccupants() {
+    	return occupants;
+    }
 
 	public void makeStairs() {
 		int[] stairs = getRandomFloorPosition();
@@ -207,4 +219,13 @@ public class Room {
 		}
 		grid[stairs[0]][stairs[1]] = Tile.STAIRS;
 	}
+	
+	public void makeExit() {
+		int[] exit = getRandomFloorPosition();
+		while(exit == null) {
+			exit = getRandomFloorPosition();
+		}
+		occupants[exit[0]][exit[1]] = new Exit(exit[0], exit[1]);
+	}
+	
 }

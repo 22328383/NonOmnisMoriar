@@ -1,3 +1,4 @@
+import core.*;
 import util.GameObject;
 import util.Point3f;
 import util.Vector3f;
@@ -10,6 +11,7 @@ public class Player {
     private int damage = 5;
     private int tileX;
     private int tileY;
+    private int gold = 0;
 
     public Player() {
         sprite = new GameObject(
@@ -72,4 +74,19 @@ public class Player {
     public GameObject getSprite() {
         return sprite;
     }
+
+	public int getGold() {
+		return gold;
+	}
+
+	public void addGold(int gold) {
+		this.gold = this.gold + gold;
+	}
+	
+	public void reset() {
+		this.gold      = 0;
+		this.maxHP     = 25;
+		this.damage    = 5;
+		this.hitPoints = 25;
+	}
 }

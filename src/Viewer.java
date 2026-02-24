@@ -11,8 +11,12 @@ import java.util.LinkedList;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import core.*;
+import mobs.*;
+
 
 public class Viewer extends JPanel {
+	private Font logFont;
 
     private TextureCache textureCache = new TextureCache();
 
@@ -20,6 +24,7 @@ public class Viewer extends JPanel {
 
     public Viewer(Model world) {
         this.gameworld = world;
+        loadFont();
     }
 
     public Viewer(LayoutManager layout) {
@@ -41,24 +46,34 @@ public class Viewer extends JPanel {
 
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    	switch(gameworld.getState()) {
+    	case INV:
+    		break;
+    	default:
+            super.paintComponent(g);
 
-        // Draw room
-        drawRoom(g);
-        drawLog(g);
+            // Draw room
+            drawRoom(g);
+            drawLog(g);
 
-        // Draw player
-        int x = (int) gameworld.getPlayer().getSprite().getCentre().getX();
-        int y = (int) gameworld.getPlayer().getSprite().getCentre().getY();
-        int width = (int) gameworld.getPlayer().getSprite().getWidth();
-        int height = (int) gameworld.getPlayer().getSprite().getHeight();
-        String texture = gameworld.getPlayer().getSprite().getTexture();
+            // Draw player
+            int x = (int) gameworld.getPlayer().getSprite().getCentre().getX();
+            int y = (int) gameworld.getPlayer().getSprite().getCentre().getY();
+            int width = (int) gameworld.getPlayer().getSprite().getWidth();
+            int height = (int) gameworld.getPlayer().getSprite().getHeight();
+            String texture = gameworld.getPlayer().getSprite().getTexture();
 
-        LinkedList<Enemy> mobs = gameworld.getMobs();
-        for(int i = 0; i < mobs.size(); i++) {
-        	g.drawImage(textureCache.getImg(mobs.get(i).getTexture()), mobs.get(i).getX() * GameConstants.TILE_SIZE, mobs.get(i).getY() * GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, null);
-        }
-        drawPlayer(x, y, width, height, texture, g);
+            Occupant[][] occupants = gameworld.getOccupants();
+            for(int i = 0; i < GameConstants.GRID_SIZE; i++) {
+                for(int j = 0; j < GameConstants.GRID_SIZE; j++) {
+                    if(occupants[i][j] != null) {
+                        g.drawImage(textureCache.getImg(occupants[i][j].getTexture()), i * GameConstants.TILE_SIZE, j * GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, null);
+                    }
+                }
+            }
+            drawPlayer(x, y, width, height, texture, g);
+    		break;
+    	}
 
     }
 
@@ -94,6 +109,15 @@ public class Viewer extends JPanel {
             }
         }
     }
+    
+    private void loadFont() {
+        try {
+            logFont = Font.createFont(Font.TRUETYPE_FONT, new File(GameConstants.FONT)).deriveFont(Font.PLAIN, 11);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logFont = new Font("Monospaced", Font.PLAIN, 14);
+        }
+    }
 
     private void drawPlayer(int x, int y, int width, int height, String texture, Graphics g) {
         Image playerImg = textureCache.getImg(texture);
@@ -105,7 +129,11 @@ public class Viewer extends JPanel {
     	g.fillRect(0, (GameConstants.WINDOW_HEIGHT-GameConstants.LOG_HEIGHT), GameConstants.WINDOW_WIDTH, GameConstants.LOG_HEIGHT);
     	
     	g.setColor(Color.WHITE);
-    	g.setFont(new Font("Monospaced", Font.PLAIN, 14));
+    	g.setFont(logFont);
+    	g.drawString(gameworld.getPlayer().getGold() + " G", 10, GameConstants.WINDOW_HEIGHT - GameConstants.LOG_HEIGHT);
+    	g.drawString(gameworld.getPlayer().getHitPoints() + " HP", GameConstants.WINDOW_WIDTH-50, GameConstants.WINDOW_HEIGHT - GameConstants.LOG_HEIGHT);
+    	g.setColor(Color.YELLOW);
+
     	LinkedList<String> log = gameworld.getLog();
     	for(int i = 0; i < log.size(); i++) {
     	    g.drawString(log.get(i), 10, GameConstants.WINDOW_HEIGHT - GameConstants.LOG_HEIGHT + 20 + (i * 20));
