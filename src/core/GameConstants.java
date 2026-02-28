@@ -81,6 +81,7 @@ public class GameConstants {
     public static final String[] SFX_EQUIP   = {SFX_EQUIP1, SFX_EQUIP2, SFX_EQUIP3};
 
     public static final String SFX_DOOR      = "res/audio/world/door.wav";
+    public static final String SFX_POTION    = "res/audio/inventory/bottle.wav";
     public static final String SFX_UI1       = "res/audio/interface/interface1.wav";
     public static final String SFX_UI2       = "res/audio/interface/interface2.wav";
     public static final String SFX_UI3       = "res/audio/interface/interface3.wav";
@@ -99,6 +100,7 @@ public class GameConstants {
     public static final String CHEST_TEXTURE2   = "res/assets/dungeon/chest_2_open.png";
 
     public static final String SHOP_TEXTURE  = "res/assets/dungeon/shops/enter_shop.png";
+    public static final String TUTORIAL_PORTAL_TEXTURE = "res/assets/dungeon/altars/unknown.png";
     public static final String GOLD_TEXTURE =  "res/assets/item/gold/gold_pile_9.png";
 
     public static final String POTION_HEALTH  = "res/assets/item/potion/ruby_old.png";

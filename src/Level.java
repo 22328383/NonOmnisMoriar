@@ -19,6 +19,12 @@ public class Level {
         spawnShop();
     }
 
+    public Level(LinkedList<Room> rooms) {
+        this.levelNumber = 0;
+        this.allRooms = rooms;
+        this.currentRoom = rooms.get(0);
+    }
+
     public LinkedList<Room> getAllRooms() {
         return allRooms;
     }

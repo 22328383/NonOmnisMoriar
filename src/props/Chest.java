@@ -43,6 +43,10 @@ public class Chest implements Occupant {
 		}
 		return inside;
 	}
+
+	public LinkedList<Item> getInside() {
+		return inside;
+	}
 	
 	private void generateLoot() {
 		int itemCnt = GameConstants.getRand(0, 3);

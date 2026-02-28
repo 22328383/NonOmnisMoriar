@@ -20,6 +20,9 @@ public class Model {
     private int deathY = -1;
 	private LinkedList<Level> dungeon = new LinkedList<Level>();
 	private LinkedList<String> log = new LinkedList<String>();
+	private TutorialLevel tutorialLevel = null;
+	private boolean inTutorial = false;
+	private boolean tutorialDone = false;
 
 	public enum GameState {
 		PLAY,
@@ -32,6 +35,15 @@ public class Model {
         Level newLevel = new Level(currLevel);
         dungeon.add(newLevel);
         room = newLevel.getCurrentRoom();
+        spawnTutorialPortal();
+    }
+
+    private void spawnTutorialPortal() {
+    	if(tutorialDone) return;
+    	int[] pos = room.getRandomFloorPosition();
+    	if(pos != null) {
+    		room.setOccupant(pos[0], pos[1], new TutorialPortal(pos[0], pos[1]));
+    	}
     }
 
     public void gamelogic() {
@@ -44,20 +56,32 @@ public class Model {
     	default:
         	clickLogic();
         	if(player.isDead()) {
-        		if(deathRoom != null) {
-        			deathRoom.clearOccupant(deathX, deathY);
+        		if(inTutorial) {
+        			inTutorial = false;
+        			tutorialLevel = null;
+        			addLog("You have fallen in the tutorial. Non Omnis Moriar.");
+        			Viewer.playSound(GameConstants.SFX_DEATH);
+        			player.reset();
+        			player.setPosition(GameConstants.PLAYER_START_X, GameConstants.PLAYER_START_Y);
+        			currLevel = 0;
+        			room = dungeon.get(0).getAllRooms().get(0);
+        			dungeon.get(0).setCurrentRoom(room);
+        		} else {
+        			if(deathRoom != null) {
+        				deathRoom.clearOccupant(deathX, deathY);
+        			}
+        			deathRoom = room;
+        			deathX = player.getTileX();
+        			deathY = player.getTileY();
+        			room.setOccupant(deathX, deathY, new GoldPile(deathX, deathY, player.getGold()));
+        			addLog("You have fallen. Non Omnis Moriar.");
+        			Viewer.playSound(GameConstants.SFX_DEATH);
+        			player.reset();
+        			player.setPosition(GameConstants.PLAYER_START_X, GameConstants.PLAYER_START_Y);
+        			currLevel = 0;
+        			room = dungeon.get(0).getAllRooms().get(0);
+        			dungeon.get(0).setCurrentRoom(room);
         		}
-        		deathRoom = room;
-        		deathX = player.getTileX();
-        		deathY = player.getTileY();
-        		room.setOccupant(deathX, deathY, new GoldPile(deathX, deathY, player.getGold()));
-        		addLog("You have fallen. Non Omnis Moriar.");
-        		Viewer.playSound(GameConstants.SFX_DEATH);
-        		player.reset();
-        		player.setPosition(GameConstants.PLAYER_START_X, GameConstants.PLAYER_START_Y);
-        		currLevel = 0;
-        		room = dungeon.get(0).getAllRooms().get(0);
-        		dungeon.get(0).setCurrentRoom(room);
         	}
             boolean playerMoved = playerLogic();
             if(playerMoved) {
@@ -92,6 +116,8 @@ public class Model {
     		    } else if(occ instanceof GoldPile) {
     		        GoldPile pile = (GoldPile)occ;
     		        addLog("A pile of " + pile.getGold() + " gold. Looks familiar.");
+    		    } else if(occ instanceof TutorialPortal) {
+    		        addLog("A mysterious portal. I should step through to learn the ropes.");
     		    }
     		    return;
     		}
@@ -99,8 +125,7 @@ public class Model {
     		for(int i = 0; i < room.getDoors().size(); i++) {
     			if(room.getDoors().get(i).getX() == cx && room.getDoors().get(i).getY() == cy) {
     				if(room.getDoors().get(i).isUsed()) {
-    					addLog("A door to room " + currLevel + "-" + (char)('A' + dungeon.get(currLevel).getAllRooms().indexOf(room.getDoors().get(i).getEndRoom()))
-);
+    					addLog("A door to room " + currLevel + "-" + (char)('A' + getCurrentRoomList().indexOf(room.getDoors().get(i).getEndRoom())));
     				} else {
     					addLog("A door to another room.");
     				}
@@ -255,6 +280,9 @@ public class Model {
     			state = GameState.INV;
     			Viewer.playSound(GameConstants.SFX_UI[getRand(0, GameConstants.SFX_UI.length - 1)]);
     			player.move(new Vector3f(-moveDir.getX(), -moveDir.getY(), 0));
+    		} else if(occupant instanceof TutorialPortal) {
+    			enterTutorial();
+    			player.move(new Vector3f(-moveDir.getX(), -moveDir.getY(), 0));
     		}
     		int mobIdx = encounterMob();
     		if(mobIdx >= 0) {
@@ -275,7 +303,21 @@ public class Model {
     	}
     }
 
+    private void enterTutorial() {
+    	tutorialLevel = new TutorialLevel();
+    	inTutorial = true;
+    	room = tutorialLevel.getFloors().get(0).getAllRooms().get(0);
+    	player.setPosition(GameConstants.PLAYER_START_X, GameConstants.PLAYER_START_Y);
+    }
+
     private void descendLevel() {
+    	if(inTutorial) {
+    		tutorialLevel.setCurrFloor(1);
+    		room = tutorialLevel.getFloors().get(1).getAllRooms().get(0);
+    		player.setPosition(GameConstants.PLAYER_START_X, GameConstants.PLAYER_START_Y);
+
+    		return;
+    	}
     	dungeon.get(currLevel).resetRoom();
     	currLevel++;
     	if(currLevel < dungeon.size()) {
@@ -291,6 +333,18 @@ public class Model {
     }
 
     private void cashOut() {
+    	if(inTutorial) {
+    		inTutorial = false;
+    		tutorialDone = true;
+    		tutorialLevel = null;
+    		player.setPosition(GameConstants.PLAYER_START_X, GameConstants.PLAYER_START_Y);
+        	currLevel = 0;
+        	dungeon.clear();
+        	Level newLevel = new Level(currLevel);
+        	dungeon.add(newLevel);
+        	room = newLevel.getCurrentRoom();
+    		return;
+    	}
     	highScore += player.getGold();
     	if(deathRoom != null) {
     		deathRoom.clearOccupant(deathX, deathY);
@@ -410,15 +464,26 @@ public class Model {
 
     }
 
+    private LinkedList<Room> getCurrentRoomList() {
+    	if(inTutorial) {
+    		return tutorialLevel.getFloors().get(tutorialLevel.getCurrFloor()).getAllRooms();
+    	}
+    	return dungeon.get(currLevel).getAllRooms();
+    }
+
     private void doorTransition(int onDoor) {
 		Room endRoom = room.getDoors().get(onDoor).getEndRoom();
 		Door endDoor = room.getDoors().get(onDoor).getEndDoor();
 		room.getDoors().get(onDoor).setUsed(true);
 		room = endRoom;
 		endDoor.setUsed(true);
-		String logTransition = "You enter room " + currLevel + "-" + (char)('A' + dungeon.get(currLevel).getAllRooms().indexOf(endRoom)) + ".";
+		String logTransition = "You enter room " + currLevel + "-" + (char)('A' + getCurrentRoomList().indexOf(endRoom)) + ".";
 		addLog(logTransition);
-		dungeon.get(currLevel).setCurrentRoom(endRoom);
+		if(inTutorial) {
+			tutorialLevel.getFloors().get(tutorialLevel.getCurrFloor()).setCurrentRoom(endRoom);
+		} else {
+			dungeon.get(currLevel).setCurrentRoom(endRoom);
+		}
 		player.setPosition(endDoor.getX(), endDoor.getY());
     }
 

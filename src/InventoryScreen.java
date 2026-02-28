@@ -201,7 +201,7 @@ public class InventoryScreen {
 							Viewer.playSound(GameConstants.SFX_GOLD[GameConstants.getRand(0, GameConstants.SFX_GOLD.length - 1)]);
 						} else if(picked instanceof Potion) {
 							player.getPotions().add((Potion)picked);
-							Viewer.playSound(GameConstants.SFX_UI[GameConstants.getRand(0, GameConstants.SFX_UI.length - 1)]);
+							Viewer.playSound(GameConstants.SFX_POTION);
 						} else {
 							Slot slot = picked.getSlot();
 							Item old = player.getEquipped().get(slot);
@@ -232,7 +232,7 @@ public class InventoryScreen {
 						} else {
 							p.activate(player.getMaxHP(), player.getHitPoints());
 						}
-						Viewer.playSound(GameConstants.SFX_UI[GameConstants.getRand(0, GameConstants.SFX_UI.length - 1)]);
+						Viewer.playSound(GameConstants.SFX_POTION);
 					}
 					break;
 				}

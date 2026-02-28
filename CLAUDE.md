@@ -69,8 +69,20 @@ A tile-based roguelike dungeon crawler. **Due: March 3rd.** The goal is to get a
 - Bounce-back on all prop interactions (Shop, Chest, Exit) — player doesn't overlap props
 - GoldPile occupant (dropped on death, reclaim by walking over)
 - Exit occupant (walk into to bank gold, start fresh dungeon)
-- Chest occupant in props/ (bump to open inventory; generates random mix of gear, loot, potions)
+- Chest occupant in props/ (bump to open inventory; generates random mix of gear, loot, potions). getInside() accessor for manual chest population
 - Shop occupant in props/ (one per level, bump to sell all loot for gold)
+- TutorialPortal occupant in props/ (spawns in first room of level 0 if tutorial not yet completed)
+
+**Tutorial System**
+- TutorialLevel class: self-contained mini dungeon with 2 floors (LinkedList<Level>)
+- Floor 0: 5 rooms — empty intro room, rat combat room, chest room (guaranteed gear + loot + health potion), shop room, stairs room
+- Floor 1: single room with Exit portal to end the tutorial
+- Level has second constructor Level(LinkedList<Room>) for manually-built levels (no random generation)
+- Model tracks tutorial state: inTutorial flag, tutorialDone flag, tutorialLevel reference
+- enterTutorial() swaps player into tutorial dungeon, descendLevel()/cashOut()/doorTransition() all gate on inTutorial
+- getCurrentRoomList() helper returns tutorial or dungeon room list based on inTutorial
+- Death in tutorial resets player back to dungeon level 0 (no gold pile dropped)
+- Completing tutorial (Exit on floor 1) preserves player gear/potions/loot, starts fresh dungeon
 
 **Enemy System**
 - Enemy system in mobs/ package: abstract Enemy base class implements Occupant, 10 subclasses
@@ -128,6 +140,7 @@ A tile-based roguelike dungeon crawler. **Due: March 3rd.** The goal is to get a
 **Sound Effects**
 - Viewer.playSound(String) using javax.sound.sampled.Clip
 - Sound for: sword hits, misses, mob-specific sounds (per subclass), gold pickup, equip, door, UI, death, cash-out
+- Potion-specific sound (bottle.wav) for pickup and use, separate from generic UI sounds
 - Enemy sounds: each subclass passes String[] sounds to base, getSound() picks random
 
 ### What's Next (in priority order)
@@ -157,9 +170,9 @@ src/
   core/         GameConstants, Tile, Slot, Occupant, Stats
   util/         GameObject, Point3f, Vector3f, UnitTests
   mobs/         Enemy (abstract) + 10 subclasses (Rat, Slime, Orc, Goblin, Troll, Knight, Wizard, Beast, Drake, Demon)
-  props/        GoldPile, Exit, Chest, Shop (Occupant implementations)
+  props/        GoldPile, Exit, Chest, Shop, TutorialPortal (Occupant implementations)
   items/        Item (abstract), Gear, Loot, Potion
-  (default)     MainWindow, Model, Viewer, Controller, Player, Room, Level, Door, TextureCache, InventoryScreen
+  (default)     MainWindow, Model, Viewer, Controller, Player, Room, Level, Door, TextureCache, InventoryScreen, TutorialLevel
 ```
 
 Named packages (core, mobs, props, items) cannot import from the default package (Java limitation). Workarounds: pass data as parameters (e.g. mob textures as String), or put shared types in core/.
@@ -174,6 +187,8 @@ Model
   -> Room room                    (current room reference)
   -> int currLevel                (current depth)
   -> deathRoom/deathX/deathY      (tracks last death for gold pile cleanup)
+  -> TutorialLevel tutorialLevel  (mini dungeon, null when not in tutorial)
+  -> boolean inTutorial/tutorialDone (tutorial state flags)
 
 Level
   -> LinkedList<Room> allRooms    (all rooms in this level)
