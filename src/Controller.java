@@ -12,9 +12,11 @@ public class Controller implements KeyListener, MouseListener {
     private static boolean keyDPressed = false;
     private static boolean keyWPressed = false;
     private static boolean keySpacePressed = false;
-    private static boolean keyIPressed = false;
+    private static boolean keyTabPressed = false;
     private static int clickX = -1;
     private static int clickY = -1;
+    private static int mouseX = -1;
+    private static int mouseY = -1;
     private static boolean clicked = false;
 
     private static final Controller instance = new Controller();
@@ -34,6 +36,10 @@ public class Controller implements KeyListener, MouseListener {
     @Override
     // Key pressed (keeps triggering while held)
     public void keyPressed(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_TAB) {
+            setKeyTabPressed(true);
+            return;
+        }
         switch (e.getKeyChar()) {
             case 'a':
                 setKeyAPressed(true);
@@ -50,9 +56,6 @@ public class Controller implements KeyListener, MouseListener {
             case ' ':
                 setKeySpacePressed(true);
                 break;
-            case 'i':
-            	setKeyIPressed(true);
-            	break;
             default:
                 // Unknown key
                 break;
@@ -61,6 +64,10 @@ public class Controller implements KeyListener, MouseListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_TAB) {
+            setKeyTabPressed(false);
+            return;
+        }
         switch (e.getKeyChar()) {
             case 'a':
                 setKeyAPressed(false);
@@ -77,9 +84,6 @@ public class Controller implements KeyListener, MouseListener {
             case ' ':
                 setKeySpacePressed(false);
                 break;
-            case 'i':
-            	setKeyIPressed(false);
-            	break;
             default:
                 // Unknown key
                 break;
@@ -87,8 +91,10 @@ public class Controller implements KeyListener, MouseListener {
     }
     
     public void mouseClicked(MouseEvent event) {
-        clickX = event.getX()/GameConstants.TILE_SIZE;
-        clickY = event.getY()/GameConstants.TILE_SIZE;
+        mouseX = event.getX();
+        mouseY = event.getY();
+        clickX = mouseX / GameConstants.TILE_SIZE;
+        clickY = mouseY / GameConstants.TILE_SIZE;
         clicked = true;
     }
     
@@ -103,6 +109,12 @@ public class Controller implements KeyListener, MouseListener {
     }
     public void setClicked(boolean c) {
     	clicked = c;
+    }
+    public int getMouseX() {
+    	return mouseX;
+    }
+    public int getMouseY() {
+    	return mouseY;
     }
 
     public boolean isKeyAPressed() {
@@ -145,12 +157,12 @@ public class Controller implements KeyListener, MouseListener {
         Controller.keySpacePressed = keySpacePressed;
     }
     
-    public boolean isKeyIPressed() {
-    	return keyIPressed;
+    public boolean isKeyTabPressed() {
+    	return keyTabPressed;
     }
-    
-    public void setKeyIPressed(boolean keyIPressed) {
-    	Controller.keyIPressed = keyIPressed;
+
+    public void setKeyTabPressed(boolean keyTabPressed) {
+    	Controller.keyTabPressed = keyTabPressed;
     }
 
 	@Override

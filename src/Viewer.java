@@ -11,6 +11,10 @@ import java.util.LinkedList;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
 import core.*;
 import mobs.*;
 
@@ -21,10 +25,14 @@ public class Viewer extends JPanel {
     private TextureCache textureCache = new TextureCache();
 
     private Model gameworld;
+    
+    private InventoryScreen invScreen;
 
     public Viewer(Model world) {
         this.gameworld = world;
+        this.invScreen = new InventoryScreen(gameworld.getPlayer(), textureCache);
         loadFont();
+        playMusic();
     }
 
     public Viewer(LayoutManager layout) {
@@ -48,15 +56,14 @@ public class Viewer extends JPanel {
     public void paintComponent(Graphics g) {
     	switch(gameworld.getState()) {
     	case INV:
+    		invScreen.draw(g);
     		break;
     	default:
             super.paintComponent(g);
 
-            // Draw room
             drawRoom(g);
             drawLog(g);
 
-            // Draw player
             int x = (int) gameworld.getPlayer().getSprite().getCentre().getX();
             int y = (int) gameworld.getPlayer().getSprite().getCentre().getY();
             int width = (int) gameworld.getPlayer().getSprite().getWidth();
@@ -139,4 +146,33 @@ public class Viewer extends JPanel {
     	    g.drawString(log.get(i), 10, GameConstants.WINDOW_HEIGHT - GameConstants.LOG_HEIGHT + 20 + (i * 20));
     	}
     }
+    
+    public InventoryScreen getInvScreen() {
+    	return invScreen;
+    }
+    
+    public static void playSound(String soundLocation) {
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(soundLocation));
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+	private static void playMusic() {
+		try {
+	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(GameConstants.BG_MUSIC));
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(audioInputStream);
+	        clip.start();
+	        clip.loop(Clip.LOOP_CONTINUOUSLY);
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	    }
+	}
+
+
 }

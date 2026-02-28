@@ -1,5 +1,8 @@
 import java.util.LinkedList;
 
+import props.Chest;
+import props.Shop;
+
 public class Level {
     private LinkedList<Room> allRooms;
     private Room currentRoom;
@@ -12,6 +15,8 @@ public class Level {
         for(int i = 0; i < allRooms.size(); i++) {
         	allRooms.get(i).spawnMobs();
         }
+        spawnChest();
+        spawnShop();
     }
 
     public LinkedList<Room> getAllRooms() {
@@ -58,7 +63,6 @@ public class Level {
         }
         currentRoom = allRooms.get(0);
 
-        // connect doors first
         for(int i = 0; i < roomCnt - 1; i++) {
             connectRooms(allRooms.get(i), allRooms.get(i + 1));
         }
@@ -70,7 +74,6 @@ public class Level {
             }
         }
 
-        // place stairs and exit after doors exist
         allRooms.getLast().makeStairs();
         boolean exitPlaced = false;
         for(int i = 0; i < roomCnt; i++) {
@@ -80,6 +83,26 @@ public class Level {
                     allRooms.get(i).makeExit();
                     exitPlaced = true;
                 }
+            }
+        }
+    }
+    
+    private void spawnShop() {
+    	Room room = allRooms.get(Model.getRand(0, allRooms.size() - 1));
+    	int[] pos = room.getRandomFloorPosition();
+    	if(pos != null) {
+    		room.setOccupant(pos[0], pos[1], new Shop(pos[0], pos[1]));
+    	}
+    }
+
+    private void spawnChest() {
+    	int roomCnt = allRooms.size();
+        for(int i = 0; i < roomCnt; i++) {
+            if(Model.getRand(1, 100) <= 15) {
+            	int[] pos = allRooms.get(i).getRandomFloorPosition();
+            	if(pos != null) {
+            		allRooms.get(i).setOccupant(pos[0], pos[1], new Chest(pos[0], pos[1], levelNumber));
+            	}
             }
         }
     }

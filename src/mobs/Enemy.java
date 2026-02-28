@@ -14,8 +14,9 @@ public abstract class Enemy implements Occupant {
     protected int speed;
     protected String name;
     protected String texture;
+    protected String[] sounds;
 
-    public Enemy(int x, int y, int health, int damage, int gold, int accuracy, int critChance, int vision, int speed, String name, String texture) {
+    public Enemy(int x, int y, int health, int damage, int gold, int accuracy, int critChance, int vision, int speed, String name, String texture, String[] sounds) {
         this.x = x;
         this.y = y;
         this.health = health;
@@ -27,6 +28,7 @@ public abstract class Enemy implements Occupant {
         this.speed = speed;
         this.name = name;
         this.texture = texture;
+        this.sounds = sounds;
     }
 
     public int getX() {
@@ -91,6 +93,10 @@ public abstract class Enemy implements Occupant {
 
     public int getCritChance() {
     	return critChance;
+    }
+
+    public String getSound() {
+    	return sounds[GameConstants.getRand(0, sounds.length - 1)];
     }
 
 }

@@ -4,8 +4,17 @@ public class Door {
     private int y;
     private Door endDoor;
     private Room endRoom;
+    private boolean used = false;
 
-    public Door(int doorX, int doorY, Door end, Room endRoom) {
+    public boolean isUsed() {
+		return used;
+	}
+
+	public void setUsed(boolean used) {
+		this.used = used;
+	}
+
+	public Door(int doorX, int doorY, Door end, Room endRoom) {
         this.x = doorX;
         this.y = doorY;
         this.endDoor = end;

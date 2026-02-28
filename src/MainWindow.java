@@ -20,6 +20,7 @@ public class MainWindow {
     private static JFrame frame = new JFrame("Non Omnis Moriar");
     private static Model gameworld = new Model();
     private static Viewer canvas = new Viewer(gameworld);
+    static { gameworld.setInvScreen(canvas.getInvScreen()); }
 
     private Controller controller = new Controller();
 
@@ -35,27 +36,16 @@ public class MainWindow {
         frame.add(canvas);
         canvas.setBounds(0, 0, GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT);
         canvas.setBackground(new Color(255, 255, 255));
-        canvas.setVisible(false);
+        canvas.setFocusTraversalKeysEnabled(false);
+        canvas.setVisible(true);
+        canvas.addKeyListener(controller);
+        canvas.addMouseListener(controller);
+        startGame = true;
 
-        JButton startMenuButton = new JButton("Start Game");
-        startMenuButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                startMenuButton.setVisible(false);
-                canvas.setVisible(true);
-                canvas.addKeyListener(controller);
-                canvas.addMouseListener(controller);
-                canvas.requestFocusInWindow();
-                startGame = true;
-            }
-        });
+        // TODO: re-enable start menu
 
-        startMenuButton.setBounds(400, 500, 200, 40);
-
-
-
-        frame.add(startMenuButton);
         frame.setVisible(true);
+        canvas.requestFocusInWindow();
     }
 
     public static void main(String[] args) {

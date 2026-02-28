@@ -1,6 +1,4 @@
 import java.util.LinkedList;
-import java.util.Random;
-
 import mobs.*;
 import core.*;
 import props.*;
@@ -12,6 +10,7 @@ import util.Vector3f;
 public class Model {
 	private int highScore = 0;
 	private GameState state = GameState.PLAY;
+	private InventoryScreen invScreen;
     private Player player;
     private Controller controller = Controller.getInstance();
     private int currLevel = 0;
@@ -21,7 +20,6 @@ public class Model {
     private int deathY = -1;
 	private LinkedList<Level> dungeon = new LinkedList<Level>();
 	private LinkedList<String> log = new LinkedList<String>();
-	static private Random r = new Random();
 
 	public enum GameState {
 		PLAY,
@@ -39,10 +37,9 @@ public class Model {
     public void gamelogic() {
     	switch(state) {
     	case INV:
-            if(controller.isKeyIPressed()) {
-            	state = GameState.PLAY;
-            	Controller.getInstance().setKeyIPressed(false);
-            }
+    		if(invScreen.handleInput(controller)) {
+    			state = GameState.PLAY;
+    		}
     		break;
     	default:
         	clickLogic();
@@ -55,6 +52,7 @@ public class Model {
         		deathY = player.getTileY();
         		room.setOccupant(deathX, deathY, new GoldPile(deathX, deathY, player.getGold()));
         		addLog("You have fallen. Non Omnis Moriar.");
+        		Viewer.playSound(GameConstants.SFX_DEATH);
         		player.reset();
         		player.setPosition(GameConstants.PLAYER_START_X, GameConstants.PLAYER_START_Y);
         		currLevel = 0;
@@ -64,6 +62,7 @@ public class Model {
             boolean playerMoved = playerLogic();
             if(playerMoved) {
             	enemyLogic();
+            	player.tickPotions();
             }
             break;
     	}
@@ -88,16 +87,23 @@ public class Model {
     		        addLog("You see a " + mob.getName() + ". Seems to have " + mob.getHealth() + " health.");
     		    } else if(occ instanceof Exit) {
     		        addLog("A way out of this mess. Walk into it to escape with your gold.");
+    		    } else if(occ instanceof Shop) {
+    		        addLog("A merchant. They might be interested in my loot.");
     		    } else if(occ instanceof GoldPile) {
     		        GoldPile pile = (GoldPile)occ;
-    		        addLog("A pile of " + pile.getGold() + " gold. Walk over it to reclaim.");
+    		        addLog("A pile of " + pile.getGold() + " gold. Looks familiar.");
     		    }
     		    return;
     		}
 
     		for(int i = 0; i < room.getDoors().size(); i++) {
     			if(room.getDoors().get(i).getX() == cx && room.getDoors().get(i).getY() == cy) {
-    				addLog("A door to another room.");
+    				if(room.getDoors().get(i).isUsed()) {
+    					addLog("A door to room " + currLevel + "-" + (char)('A' + dungeon.get(currLevel).getAllRooms().indexOf(room.getDoors().get(i).getEndRoom()))
+);
+    				} else {
+    					addLog("A door to another room.");
+    				}
     				return;
     			}
     		}
@@ -180,13 +186,19 @@ public class Model {
     	if(newX == player.getTileX() && newY == player.getTileY()) {
     		if(getRand(1, 100) > mob.getAccuracy()) {
     			addLog(mob.getName() + " tries to hit you but misses!");
+    			Viewer.playSound(GameConstants.SFX_MISSES[getRand(0, GameConstants.SFX_MISSES.length - 1)]);
+    		} else if(getRand(1, 100) <= player.getDodgeChance()) {
+    			addLog("You dodge " + mob.getName() + "'s attack!");
+    			Viewer.playSound(GameConstants.SFX_MISSES[getRand(0, GameConstants.SFX_MISSES.length - 1)]);
     		} else if(getRand(1, 100) <= mob.getCritChance()) {
     			int critDmg = mob.getDamage() * 2;
     			addLog(mob.getName() + " crits you for " + critDmg + " damage!");
     			player.takeDamage(critDmg);
+    			Viewer.playSound(mob.getSound());
     		} else {
     			addLog(mob.getName() + " hits you for " + mob.getDamage() + " damage.");
     			player.takeDamage(mob.getDamage());
+    			Viewer.playSound(mob.getSound());
     		}
     		return;
     	}
@@ -223,9 +235,26 @@ public class Model {
     		    room.clearOccupant(player.getTileX(), player.getTileY());
     		    deathRoom = null;
     		    addLog("You reclaimed " + pile.getGold() + " gold! Non Omnis Moriar.");
+    		    Viewer.playSound(GameConstants.SFX_GOLD[getRand(0, GameConstants.SFX_GOLD.length - 1)]);
     		} else if(occupant instanceof Exit) {
     		    cashOut();
+    		    player.move(new Vector3f(-moveDir.getX(), -moveDir.getY(), 0));
     		    break;
+    		} else if(occupant instanceof Shop) {
+    			int sold = player.sellLoot();
+    			if(sold > 0) {
+    				player.addGold(sold);
+    				addLog("You sell your loot for " + sold + " gold!");
+    				Viewer.playSound(GameConstants.SFX_GOLD[getRand(0, GameConstants.SFX_GOLD.length - 1)]);
+    			} else {
+    				addLog("The merchant is not interested in your loot.");
+    			}
+    			player.move(new Vector3f(-moveDir.getX(), -moveDir.getY(), 0));
+    		} else if(occupant instanceof Chest) {
+    			invScreen.setContext(occupant);
+    			state = GameState.INV;
+    			Viewer.playSound(GameConstants.SFX_UI[getRand(0, GameConstants.SFX_UI.length - 1)]);
+    			player.move(new Vector3f(-moveDir.getX(), -moveDir.getY(), 0));
     		}
     		int mobIdx = encounterMob();
     		if(mobIdx >= 0) {
@@ -236,6 +265,7 @@ public class Model {
     	case DOOR:
     		player.move(moveDir);
     		doorLogic();
+    		Viewer.playSound(GameConstants.SFX_DOOR);
     		break;
     	case STAIRS:
     		descendLevel();
@@ -257,6 +287,7 @@ public class Model {
     	}
     	player.setPosition(GameConstants.PLAYER_START_X, GameConstants.PLAYER_START_Y);
     	addLog("You descend to level " + currLevel + "...");
+    	Viewer.playSound(GameConstants.SFX_DOOR);
     }
 
     private void cashOut() {
@@ -268,6 +299,7 @@ public class Model {
     	deathX = -1;
     	deathY = -1;
     	addLog("You escape with your life... and " + player.getGold() + " gold!");
+    	Viewer.playSound(GameConstants.SFX_GOLD[getRand(0, GameConstants.SFX_GOLD.length - 1)]);
     	player.reset();
     	player.setPosition(GameConstants.PLAYER_START_X, GameConstants.PLAYER_START_Y);
     	currLevel = 0;
@@ -310,9 +342,10 @@ public class Model {
             Controller.getInstance().setKeySpacePressed(false);
         }
         
-        if(controller.isKeyIPressed()) {
+        if(controller.isKeyTabPressed()) {
+        	invScreen.setContext(null);
         	state = GameState.INV;
-        	Controller.getInstance().setKeyIPressed(false);
+        	Controller.getInstance().setKeyTabPressed(false);
         }
 
         return moveMade;
@@ -332,14 +365,30 @@ public class Model {
     private void attackMob(int mobIdx) {
     	LinkedList<Enemy> mobs = room.getMobs();
     	Enemy target = mobs.get(mobIdx);
-    	int dmg = player.getDamage();
-    	target.takeDamage(dmg);
-    	addLog("You hit the " + target.getName() + " for " + dmg + " damage.");
-    	if(target.isDead()) {
-    		room.clearOccupant(target.getX(), target.getY());
-    		addLog(target.getName() + " dies!");
-    		player.addGold(target.getGold() * (currLevel+1));
-    		mobs.remove(mobIdx);
+    	int didHit = getRand(0, 100);
+    	if(didHit <= player.getAccuracy()) {
+        	int dmg = getRand(player.getDamageLow(), player.getDamageHigh());
+        	int didCrit = getRand(0, 100);
+        	if(didCrit <= player.getCritChance()) {
+        		dmg = dmg*(player.getCritModifier());
+            	target.takeDamage(dmg);
+            	addLog("You crit the " + target.getName() + " for " + dmg + " damage!");
+        	} else {
+            	target.takeDamage(dmg);
+            	addLog("You hit the " + target.getName() + " for " + dmg + " damage.");
+        	}
+        	if(target.isDead()) {
+        		room.clearOccupant(target.getX(), target.getY());
+        		addLog(target.getName() + " dies!");
+        		player.addGold((target.getGold() + (currLevel+1))*player.getGoldModifier());
+        		mobs.remove(mobIdx);
+        		Viewer.playSound(GameConstants.SFX_GOLD[getRand(0, GameConstants.SFX_GOLD.length - 1)]);
+        	} else {
+        		Viewer.playSound(GameConstants.SFX_SWORDS[getRand(0, GameConstants.SFX_SWORDS.length - 1)]);
+        	}
+    	} else {
+    		addLog("You miss the " + target.getName() + "!");
+    		Viewer.playSound(GameConstants.SFX_MISSES[getRand(0, GameConstants.SFX_MISSES.length - 1)]);
     	}
     }
 
@@ -364,7 +413,9 @@ public class Model {
     private void doorTransition(int onDoor) {
 		Room endRoom = room.getDoors().get(onDoor).getEndRoom();
 		Door endDoor = room.getDoors().get(onDoor).getEndDoor();
+		room.getDoors().get(onDoor).setUsed(true);
 		room = endRoom;
+		endDoor.setUsed(true);
 		String logTransition = "You enter room " + currLevel + "-" + (char)('A' + dungeon.get(currLevel).getAllRooms().indexOf(endRoom)) + ".";
 		addLog(logTransition);
 		dungeon.get(currLevel).setCurrentRoom(endRoom);
@@ -399,9 +450,13 @@ public class Model {
     }
 
     static public int getRand(int min, int max) {
-    	return r.nextInt(max - min + 1) + min;
+    	return GameConstants.getRand(min, max);
     }
-    
+
+    public void setInvScreen(InventoryScreen invScreen) {
+    	this.invScreen = invScreen;
+    }
+
     public GameState getState() {
     	return state;
     }
