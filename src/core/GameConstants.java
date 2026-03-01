@@ -15,8 +15,8 @@ public class GameConstants {
 	}
 
 	public static final int LOG_HEIGHT    = 200;
-    public static final int WINDOW_WIDTH  = 500;
-    public static final int WINDOW_HEIGHT = LOG_HEIGHT + 500;
+    public static final int WINDOW_WIDTH  = 800;
+    public static final int WINDOW_HEIGHT = LOG_HEIGHT + 800;
 
     public static final int GRID_SIZE = 20;
     public static final int TILE_SIZE = WINDOW_WIDTH / GRID_SIZE;
@@ -92,6 +92,23 @@ public class GameConstants {
     public static final String VOID_TEXTURE   = "res/assets/dungeon/wall/brick_dark_0.png";
     public static final String FLOOR_TEXTURE  = "res/assets/dungeon/wall/stone_brick_1.png";
     public static final String WALL_TEXTURE   = "res/assets/dungeon/wall/catacombs_0.png";
+
+    public static final String[] VOID_TEXTURES = {
+        "res/assets/dungeon/wall/brick_dark_0.png", "res/assets/dungeon/wall/brick_dark_1.png",
+        "res/assets/dungeon/wall/brick_dark_2.png", "res/assets/dungeon/wall/brick_dark_3.png"
+    };
+    public static final String[] WALL_TEXTURES = {
+        "res/assets/dungeon/wall/brick_gray_0.png", "res/assets/dungeon/wall/brick_gray_1.png",
+        "res/assets/dungeon/wall/brick_gray_2.png", "res/assets/dungeon/wall/brick_gray_3.png"
+    };
+    public static final String[] FLOOR_TEXTURES = {
+        "res/assets/dungeon/wall/catacombs_0.png", "res/assets/dungeon/wall/catacombs_1.png",
+        "res/assets/dungeon/wall/catacombs_2.png", "res/assets/dungeon/wall/catacombs_3.png",
+        "res/assets/dungeon/wall/catacombs_4.png", "res/assets/dungeon/wall/catacombs_5.png",
+        "res/assets/dungeon/wall/catacombs_6.png", "res/assets/dungeon/wall/catacombs_7.png",
+        "res/assets/dungeon/wall/catacombs_8.png", "res/assets/dungeon/wall/catacombs_9.png",
+        "res/assets/dungeon/wall/catacombs_10.png", "res/assets/dungeon/wall/catacombs_11.png"
+    };
     public static final String DOOR_TEXTURE   = "res/assets/dungeon/doors/closed_door.png";
     public static final String STAIRS_TEXTURE = "res/assets/dungeon/gateways/stone_stairs_down.png";
     public static final String EXIT_TEXTURE1   = "res/assets/dungeon/gateways/exit.png";
@@ -128,4 +145,6 @@ public class GameConstants {
     public static final int DEFAULT_CRIT_MODIFIER = 2;
     public static final int DEFAULT_DODGE_CHANCE  = 0;
     public static final int DEFAULT_GOLD_MODIFIER = 1;
+
+    public static final int FOG_MAX_RADIUS = 6;
 }

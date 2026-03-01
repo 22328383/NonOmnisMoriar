@@ -1,7 +1,7 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-
+// TODO 3 is no longer needed — Color and Graphics are already imported!
 import java.awt.Image;
 import java.awt.LayoutManager;
 import java.io.File;
@@ -62,7 +62,6 @@ public class Viewer extends JPanel {
             super.paintComponent(g);
 
             drawRoom(g);
-            drawLog(g);
 
             int x = (int) gameworld.getPlayer().getSprite().getCentre().getX();
             int y = (int) gameworld.getPlayer().getSprite().getCentre().getY();
@@ -70,59 +69,65 @@ public class Viewer extends JPanel {
             int height = (int) gameworld.getPlayer().getSprite().getHeight();
             String texture = gameworld.getPlayer().getSprite().getTexture();
 
+            int playerX = gameworld.getPlayerTileX();
+            int playerY = gameworld.getPlayerTileY();
             Occupant[][] occupants = gameworld.getOccupants();
             for(int i = 0; i < GameConstants.GRID_SIZE; i++) {
                 for(int j = 0; j < GameConstants.GRID_SIZE; j++) {
                     if(occupants[i][j] != null) {
-                        g.drawImage(textureCache.getImg(occupants[i][j].getTexture()), i * GameConstants.TILE_SIZE, j * GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, null);
+                        int dist = Math.abs(i - playerX) + Math.abs(j - playerY);
+                        if(dist <= GameConstants.FOG_MAX_RADIUS) {
+                            g.drawImage(textureCache.getImg(occupants[i][j].getTexture()), i * GameConstants.TILE_SIZE, j * GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, null);
+                        }
                     }
                 }
             }
             drawPlayer(x, y, width, height, texture, g);
+            drawLog(g);
     		break;
     	}
 
     }
 
     private void drawRoom(Graphics g) {
+    	int playerX = gameworld.getPlayerTileX();
+    	int playerY = gameworld.getPlayerTileY();
         Tile[][] tiles = gameworld.getRoom();
+        String[][] textures = gameworld.getRoomTextures();
         for (int i = 0; i < GameConstants.GRID_SIZE; i++) {
             for (int j = 0; j < GameConstants.GRID_SIZE; j++) {
-                String texturePath;
-                switch (tiles[i][j]) {
-                case VOID:
-                    texturePath = GameConstants.VOID_TEXTURE;
-                    break;
-                case FLOOR:
-                    texturePath = GameConstants.FLOOR_TEXTURE;
-                    break;
-                case WALL:
-                    texturePath = GameConstants.WALL_TEXTURE;
-                    break;
-                case DOOR:
-                    texturePath = GameConstants.DOOR_TEXTURE;
-                    break;
-                case STAIRS:
-                	texturePath = GameConstants.STAIRS_TEXTURE;
-                	break;
-                default:
-                    texturePath = GameConstants.VOID_TEXTURE;
-                    break;
-                }
-                Image textureToRender = textureCache.getImg(texturePath);
-                int startX = GameConstants.TILE_SIZE * i;
-                int startY = GameConstants.TILE_SIZE * j;
-                g.drawImage(textureToRender, startX, startY, GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, null);
+            	int dist = Math.abs(i - playerX) + Math.abs(j - playerY);
+            	if(dist > GameConstants.FOG_MAX_RADIUS) {
+            		g.setColor(Color.BLACK);
+            		g.fillRect(i * GameConstants.TILE_SIZE, j * GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, GameConstants.TILE_SIZE);
+            	} else {
+                    String texturePath;
+                    switch (tiles[i][j]) {
+                    case DOOR:
+                        texturePath = GameConstants.DOOR_TEXTURE;
+                        break;
+                    case STAIRS:
+                    	texturePath = GameConstants.STAIRS_TEXTURE;
+                    	break;
+                    default:
+                        texturePath = textures[i][j];
+                        break;
+                    }
+                    Image textureToRender = textureCache.getImg(texturePath);
+                    int startX = GameConstants.TILE_SIZE * i;
+                    int startY = GameConstants.TILE_SIZE * j;
+                    g.drawImage(textureToRender, startX, startY, GameConstants.TILE_SIZE, GameConstants.TILE_SIZE, null);
+            	}
             }
         }
     }
-    
+
     private void loadFont() {
         try {
-            logFont = Font.createFont(Font.TRUETYPE_FONT, new File(GameConstants.FONT)).deriveFont(Font.PLAIN, 11);
+            logFont = Font.createFont(Font.TRUETYPE_FONT, new File(GameConstants.FONT)).deriveFont(Font.PLAIN, 16);
         } catch (Exception e) {
             e.printStackTrace();
-            logFont = new Font("Monospaced", Font.PLAIN, 14);
+            logFont = new Font("Monospaced", Font.PLAIN, 18);
         }
     }
 
@@ -138,7 +143,7 @@ public class Viewer extends JPanel {
     	g.setColor(Color.WHITE);
     	g.setFont(logFont);
     	g.drawString(gameworld.getPlayer().getGold() + " G", 10, GameConstants.WINDOW_HEIGHT - GameConstants.LOG_HEIGHT);
-    	g.drawString(gameworld.getPlayer().getHitPoints() + " HP", GameConstants.WINDOW_WIDTH-50, GameConstants.WINDOW_HEIGHT - GameConstants.LOG_HEIGHT);
+    	g.drawString(gameworld.getHighScore() + " HS", GameConstants.WINDOW_WIDTH-50, GameConstants.WINDOW_HEIGHT - GameConstants.LOG_HEIGHT);
     	g.setColor(Color.YELLOW);
 
     	LinkedList<String> log = gameworld.getLog();

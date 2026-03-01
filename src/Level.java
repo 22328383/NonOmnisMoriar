@@ -104,7 +104,7 @@ public class Level {
     private void spawnChest() {
     	int roomCnt = allRooms.size();
         for(int i = 0; i < roomCnt; i++) {
-            if(Model.getRand(1, 100) <= 15) {
+            if(Model.getRand(1, 100) <= 45) {
             	int[] pos = allRooms.get(i).getRandomFloorPosition();
             	if(pos != null) {
             		allRooms.get(i).setOccupant(pos[0], pos[1], new Chest(pos[0], pos[1], levelNumber));

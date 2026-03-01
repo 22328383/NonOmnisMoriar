@@ -99,6 +99,11 @@ public class Model {
     		int cy = controller.getClickY();
 
     		player.computeLocation();
+    		int fogDist = Math.abs(cx - player.getTileX()) + Math.abs(cy - player.getTileY());
+    		if(fogDist > GameConstants.FOG_MAX_RADIUS) {
+    			addLog("I see nothing but darkness.");
+    			return;
+    		}
     		if(cx == player.getTileX() && cy == player.getTileY()) {
     			addLog("It is you. You have " + player.getHitPoints() + "/" + player.getMaxHP() + " health.");
     			return;
@@ -337,6 +342,9 @@ public class Model {
     		inTutorial = false;
     		tutorialDone = true;
     		tutorialLevel = null;
+    		highScore += player.getGold();
+    		addLog("You escaped the dungeon alive. Your gold is banked.");
+    		Viewer.playSound(GameConstants.SFX_GOLD[getRand(0, GameConstants.SFX_GOLD.length - 1)]);
     		player.setPosition(GameConstants.PLAYER_START_X, GameConstants.PLAYER_START_Y);
         	currLevel = 0;
         	dungeon.clear();
@@ -506,12 +514,30 @@ public class Model {
         return room.getGrid();
     }
 
+    public String[][] getRoomTextures() {
+        return room.getTextures();
+    }
+    
+    public int getPlayerTileX() {
+    	player.computeLocation();
+    	return player.getTileX();
+    }
+    
+    public int getPlayerTileY() {
+    	player.computeLocation();
+    	return player.getTileY();
+    }
+
     public Occupant[][] getOccupants() {
         return room.getOccupants();
     }
 
     public LinkedList<Enemy> getMobs() {
         return room.getMobs();
+    }
+
+    public int getHighScore() {
+        return highScore;
     }
 
     static public int getRand(int min, int max) {

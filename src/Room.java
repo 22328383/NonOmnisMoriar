@@ -5,6 +5,7 @@ import props.*;
 
 public class Room {
     private Tile[][] grid;
+    private String[][] textures;
     private Occupant[][] occupants;
     private LinkedList<Door> doors;
     private LinkedList<Enemy> mobs = new LinkedList<Enemy>();
@@ -15,6 +16,7 @@ public class Room {
     public Room(int sizeX, int sizeY, int level) {
         doors = new LinkedList<Door>();
         grid = new Tile[GameConstants.GRID_SIZE][GameConstants.GRID_SIZE];
+        textures = new String[GameConstants.GRID_SIZE][GameConstants.GRID_SIZE];
         occupants = new Occupant[GameConstants.GRID_SIZE][GameConstants.GRID_SIZE];
         generateRoom(sizeX, sizeY);
         X = sizeX;
@@ -31,10 +33,13 @@ public class Room {
             for(int j = 0; j < GameConstants.GRID_SIZE; j++) {
                 if(i < xSize || i >= GameConstants.GRID_SIZE - xSize || j < ySize || j >= GameConstants.GRID_SIZE - ySize) {
                     grid[i][j] = Tile.VOID;
+                    textures[i][j] = GameConstants.VOID_TEXTURES[GameConstants.getRand(0, GameConstants.VOID_TEXTURES.length - 1)];
                 } else if(i == xSize || i == GameConstants.GRID_SIZE - xSize - 1 || j == ySize || j == GameConstants.GRID_SIZE - ySize - 1) {
                     grid[i][j] = Tile.WALL;
+                    textures[i][j] = GameConstants.WALL_TEXTURES[GameConstants.getRand(0, GameConstants.WALL_TEXTURES.length - 1)];
                 } else {
                     grid[i][j] = Tile.FLOOR;
+                    textures[i][j] = GameConstants.FLOOR_TEXTURES[GameConstants.getRand(0, GameConstants.FLOOR_TEXTURES.length - 1)];
                 }
             }
         }
@@ -175,6 +180,10 @@ public class Room {
 
     public Tile[][] getGrid() {
         return grid;
+    }
+
+    public String[][] getTextures() {
+        return textures;
     }
 
     public void addDoor(int x, int y, Door endDoor, Room endRoom) {

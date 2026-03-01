@@ -244,10 +244,10 @@ public class InventoryScreen {
 
     private void loadFont() {
         try {
-            font = Font.createFont(Font.TRUETYPE_FONT, new File(GameConstants.FONT)).deriveFont(Font.PLAIN, 8);
+            font = Font.createFont(Font.TRUETYPE_FONT, new File(GameConstants.FONT)).deriveFont(Font.PLAIN, 14);
         } catch (Exception e) {
             e.printStackTrace();
-            font = new Font("Monospaced", Font.PLAIN, 14);
+            font = new Font("Monospaced", Font.PLAIN, 16);
         }
     }
 }

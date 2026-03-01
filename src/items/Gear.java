@@ -21,7 +21,7 @@ public class Gear extends Item {
 		{ "Morningstar",       "res/assets/item/weapon/morningstar_3.png",       14, 0, 4, 7,-10,0, 0, 0, 0 },
 		{ "Quarterstaff",      "res/assets/item/weapon/quarterstaff_new.png",    5,  0, 1, 3, 0, 0, 0, 5, 0 },
 		{ "Warhammer",         "res/assets/item/weapon/hammer_1_old.png",        15, 0, 4, 7,-5, 0, 0,-5, 0 },
-		{ "Warmaul",           "res/assets/item/weapon/mace_large_3.png",        20, 0, 5, 9,-10,0, 0,-10,0 },
+		{ "Warmaul",           "res/assets/item/weapon/mace_large_1_new.png",    20, 0, 5, 9,-10,0, 0,-10,0 },
 		//daggers
 		{ "Kris Dagger",       "res/assets/item/weapon/dagger_3.png",            9,  0, 1, 2, 0, 10,1, 5, 0 },
 		{ "Castillon Dagger",  "res/assets/item/weapon/dagger_6.png",            8,  0, 1, 3, 0, 8, 1, 0, 0 },
@@ -29,14 +29,14 @@ public class Gear extends Item {
 		{ "Stiletto Dagger",   "res/assets/item/weapon/orcish_dagger.png",       11, 0, 1, 2, 0, 15,1, 5, 0 },
 		//spearlikes
 		{ "Bardiche",          "res/assets/item/weapon/glaive_1.png",            14, 0, 4, 7, 0, 0, 0,-5, 0 },
-		{ "Halberd",           "res/assets/item/weapon/trishula.png",            16, 0, 4, 8,-5, 0, 0,-5, 0 },
-		{ "Spear",             "res/assets/item/weapon/spear_2_new.png",         9,  0, 3, 5, 5, 0, 0, 0, 0 },
+		{ "Halberd",           "res/assets/item/weapon/glaive_2.png",            16, 0, 4, 8,-5, 0, 0,-5, 0 },
+		{ "Spear",             "res/assets/item/weapon/spear_1.png",         	 9,  0, 3, 5, 5, 0, 0, 0, 0 },
 		//axes
 		{ "Battleaxe",         "res/assets/item/weapon/broad_axe_1.png",         14, 0, 4, 7,-5, 5, 0, 0, 0 },
-		{ "Hatchet",           "res/assets/item/weapon/hand_axe_3.png",          7,  0, 2, 4, 0, 5, 0, 0, 0 },
+		{ "Hatchet",           "res/assets/item/weapon/hand_axe_1_new.png",      7,  0, 2, 4, 0, 5, 0, 0, 0 },
 		{ "Double Axe",        "res/assets/item/weapon/executioner_axe.png",     19, 0, 5, 8,-10,0, 0,-5, 0 },
 		//misc
-		{ "Magic Staff",       "res/assets/item/staff/staff_mage.png",           12, 0, 2, 4, 0, 5, 0, 0, 1 },
+		{ "Magic Staff",       "res/assets/item/staff/staff_2.png",           	 12, 0, 2, 4, 0, 5, 0, 0, 1 },
 		{ "Gauntlets",         "res/assets/item/armor/hands/gauntlet_1.png",     8,  0, 1, 3, 10,5, 0, 5, 0 },
 	};
 
@@ -53,12 +53,12 @@ public class Gear extends Item {
 		{ "Bycocket",          "res/assets/item/armor/headgear/hat_2.png",             4,  1, 0, 0, 0, 0, 0, 5, 0 },
 		{ "Coif",              "res/assets/item/armor/headgear/cap_2.png",             5,  3, 0, 0, 0, 0, 0, 2, 0 },
 		{ "Hat",               "res/assets/item/armor/headgear/hat_1.png",             3,  1, 0, 0, 0, 0, 0, 3, 0 },
-		{ "Hood",              "res/assets/item/armor/headgear/elven_leather_helm.png", 5, 2, 0, 0, 0, 0, 0, 5, 0 },
+		{ "Hood",              "res/assets/item/armor/headgear/elven_leather_helm.png",5, 2, 0, 0, 0, 0, 0, 5, 0 },
 		{ "Bonnet",            "res/assets/item/armor/headgear/cap_1.png",             3,  1, 0, 0, 0, 0, 0, 3, 0 },
-		{ "Ninja Cowl",        "res/assets/item/armor/headgear/green_mask.png",        8,  1, 0, 0, 0, 5, 0, 8, 0 },
+		{ "Ninja Cowl",        "res/assets/item/armor/headgear/cap_2.png",        	   8,  1, 0, 0, 0, 5, 0, 8, 0 },
 		{ "Ranger Hood",       "res/assets/item/armor/headgear/hat_3.png",             6,  2, 0, 0, 5, 0, 0, 5, 0 },
-		{ "Rogue Cowl",        "res/assets/item/armor/headgear/green_mask.png",        7,  1, 0, 0, 0, 8, 0, 6, 0 },
-		{ "Cloth Mask",        "res/assets/item/armor/headgear/green_mask.png",        4,  1, 0, 0, 0, 3, 0, 3, 0 },
+		{ "Rogue Cowl",        "res/assets/item/armor/headgear/cap_1.png",             7,  1, 0, 0, 0, 8, 0, 6, 0 },
+		{ "Cloth Mask",        "res/assets/item/armor/headgear/cap_2.png",        	   4,  1, 0, 0, 0, 3, 0, 3, 0 },
 		{ "Straw Hat",         "res/assets/item/armor/headgear/hat_1.png",             3,  1, 0, 0, 0, 0, 0, 2, 1 },
 		//magic
 		{ "Cultist Mask",      "res/assets/item/armor/headgear/cornuthaum.png",        7,  2, 0, 0, 0, 5, 1, 0, 0 },
